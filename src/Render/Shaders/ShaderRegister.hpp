@@ -1,0 +1,19 @@
+/// FileName: ShaderRegister.hpp
+/// Date: 2025/06/03
+/// Author: ChaomengOrion
+
+#pragma once
+
+#include "Shader.hpp"
+#include "S_BlinnPhongShader.hpp"
+
+namespace aries::shader {
+    // 类型列表 - 用于存储所有着色器类型
+    template<ShaderConcept... Ts> struct TypeList {};
+
+    // 着色器类型注册表
+    using RegisteredShaders = TypeList<
+        BlinnPhongShader
+        // 添加其他着色器...
+    >;
+}

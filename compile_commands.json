@@ -1,0 +1,7 @@
+[
+    {
+        "directory": "e:/Program_Dev/SoftRender",
+        "file": "e:/Program_Dev/SoftRender/src/main.cpp",
+        "command": "x86_64-w64-mingw32-g++ -std=c++23 -Ofast -Ilibs/imgui -Ilibs/glfw-3.4.bin.WIN64/include -Ilibs/boost -Ilibs/misc -Ilibs/eigen src/*.cpp libs/imgui/*.cpp -o build/Aries.exe -fopenmp -Llibs/glfw-3.4.bin.WIN64/lib-mingw-w64 -lglfw3 -lopengl32 -lgdi32 -luser32 -lole32 -ldwmapi -ldxgi -ld3d11 -ld3dcompiler"
+    }
+]
