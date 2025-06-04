@@ -11,9 +11,9 @@ void Raster::InitBuffers(int width, int height) {
     std::cout << "[Raster]" << "帧缓冲区被设置为" << width << 'x' << height << '\n';
     swW = width;
     swH = height;
-    swBuffer[0].assign(swW * swH * 4, 0x00); // RGBA
-    swBuffer[1].assign(swW * swH * 4, 0x00); // RGBA
-    swBuffer[2].assign(swW * swH * 4, 0x00); // RGBA
+    swBuffer.assign(swW * swH * 4, 0x00); // RGBA
+    //swBuffer[1].assign(swW * swH * 4, 0x00); // RGBA
+    //swBuffer[2].assign(swW * swH * 4, 0x00); // RGBA
     glGenTextures(1, &swTex);
     glBindTexture(GL_TEXTURE_2D, swTex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -26,28 +26,28 @@ void Raster::InitBuffers(int width, int height) {
 }
 
 void Raster::ClearCurrentBuffer() {
-    std::memset(swBuffer[swCur].data(), 0x00, swW * swH * 4);
+    std::memset(swBuffer.data(), 0x00, swW * swH * 4);
 }
 
 // CPU 端写像素
 void Raster::SetPixel(int x, int y, color_t r, color_t g, color_t b, color_t a) {
     if (x < 0 || x >= swW || y < 0 || y >= swH) return;
     int idx = (y * swW + x) * 4;
-    swBuffer[swCur][idx + 0] = r;
-    swBuffer[swCur][idx + 1] = g;
-    swBuffer[swCur][idx + 2] = b;
-    swBuffer[swCur][idx + 3] = a;
+    swBuffer[idx + 0] = r;
+    swBuffer[idx + 1] = g;
+    swBuffer[idx + 2] = b;
+    swBuffer[idx + 3] = a;
 }
 
 // 切换缓冲区
-void Raster::SwapBuffers() {
+/*void Raster::SwapBuffers() {
     swLast = swCur; // 保存当前缓冲区索引
     swCur = (swCur + 1) % 3; // 切换到下一个缓冲区
-}
+}*/
 
 // 上传像素缓冲区到 GPU
 void Raster::UploadToGPU() {
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, swW, swH, GL_RGBA, GL_UNSIGNED_BYTE, swBuffer[swLast].data());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, swW, swH, GL_RGBA, GL_UNSIGNED_BYTE, swBuffer.data());
 }
 
 // 绘制全屏四边形，采样像素缓冲区

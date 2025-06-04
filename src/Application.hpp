@@ -30,10 +30,11 @@ namespace aries {
 
     public:
         void Init();
-        void StartRenderThread();
-        void OnUpdate();
+        // void StartRenderThread();
+        void OnUpdate(SharedConfig& config);
         void LoadModel(const std::string& filename);
         void ProcessMouseInput(double xpos, double ypos);
         void ProcessMouseButton(int button, int action);
+        void ProcessMouseScroll(double yoffset);
     };
 }

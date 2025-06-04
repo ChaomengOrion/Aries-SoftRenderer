@@ -86,20 +86,4 @@ namespace aries::shader {
                                 { ShaderT::VertexShaderImpl(std::declval<VertexPaylod<ShaderT>>(), std::declval<a2v>()) } -> std::convertible_to<typename ShaderT::v2f_t>;
                                 { ShaderT::FragmentShaderImpl(std::declval<FragmentPaylod<ShaderT>>(), std::declval<v2f<ShaderT>>()) } -> std::convertible_to<Vector3f>;
                             };
-
-    template<>
-    struct ShaderProperty<class BlinnPhongShader> {
-        sptr<Texture> texture; // 纹理
-
-        Vector3f ambient = Vector3f(1.f, 1.f, 1.f); // 环境光
-        float ambientIntensity = 0.1f; // 环境光强度
-
-        Vector3f diffuse = Vector3f(1.f, 1.f, 1.f); // 漫反射光
-        float diffuseIntensity = 0.889f; // 漫反射光强度
-
-        Vector3f specular = Vector3f(1.0f, 0.8f, 0.5f); // 镜面反射光
-        float specularIntensity = 0.288f; // 镜面反射光强度
-
-        float shininess = 8.f; // 高光指数，用于控制高光的锐利程度
-    };
 }

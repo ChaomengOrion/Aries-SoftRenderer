@@ -16,13 +16,17 @@ set_languages("c++23")
 
 -- 添加构建模式
 add_rules("mode.debug", "mode.release")
+
+-- 默认构建模式
+set_defaultmode("release")
+
 if is_mode("debug") then
     add_cxxflags("-Og")
     -- add_cxxflags("-Wall", "-Wextra")  -- 开启所有警告
     add_defines("DEBUG")
     set_symbols("debug")  -- 开启调试符号
 elseif is_mode("release") then
-    add_cxxflags("-O2")  -- 发布模式下优化级别为O2
+    set_optimize("fastest")
     set_symbols("hidden") -- 隐藏符号
 end
 

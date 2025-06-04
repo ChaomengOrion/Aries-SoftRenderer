@@ -21,7 +21,9 @@ namespace aries::render {
         renderer = std::make_shared<Renderer>(raster, w, h);
     }
 
-    void Pipeline::Draw(sptr<Scene>& scene, sptr<Camera>& cam) {
+    void Pipeline::Render(sptr<Scene> scene, sptr<Camera> cam) {
+        renderer->SetCameraAndScene(std::move(cam), std::move(scene));
+
         static auto lastFrameTime = std::chrono::system_clock::now();
         static auto currentFrameTime = std::chrono::system_clock::now();
 
@@ -33,7 +35,7 @@ namespace aries::render {
         //* 清空
         renderer->Clear();
 
-        shapeListMutex.lock_shared();
+        //shapeListMutex.lock_shared();
         
         //* 把形状按着色器类型分组
         std::unordered_map<ShaderType, vector<sptr<Shape>>> shapeGroups;
@@ -51,18 +53,23 @@ namespace aries::render {
         //* 送入渲染器
         for (auto [shaderType, shapes] : shapeGroups) {
             //auto ret = renderer->VertexShaderWith<BlinnPhongShader>(shapes, scene, cam);
-            renderer->RenderWithShader(shaderType, shapes, scene, cam, tempCnt);
+            renderer->RenderWithShader(shaderType, shapes, tempCnt);
         }
 
         triangleCount = tempCnt; // 更新三角形计数
 
-        shapeListMutex.unlock_shared();
+        //* 绘制坐标系
+        if (showCoordinateSystem) {
+            renderer->DrawCoordinateSystem();
+        }
+
+        //shapeListMutex.unlock_shared();
 
         //* 交换CPU缓冲区
-        raster->SwapBuffers();
+        //raster->SwapBuffers();
     }
 
-    void Pipeline::OnUpdate() {
+    void Pipeline::Draw() {
         // 4. 提交并绘制
         raster->UploadToGPU();
         raster->Draw();
@@ -70,9 +77,9 @@ namespace aries::render {
 
     void Pipeline::AddShape(std::weak_ptr<Shape> obj) {
         if (auto shape = obj.lock()) {
-            shapeListMutex.lock();
+            //shapeListMutex.lock();
             shapeList.push_back(shape);
-            shapeListMutex.unlock();
+            //shapeListMutex.unlock();
             std::cout << "[Pipeline] 添加形状：" << shape->name << "，三角形数：" << shape->mesh.size()
                     << '\n';
         } else {
@@ -81,12 +88,12 @@ namespace aries::render {
     }
 
     void Pipeline::CleanUpUnusedShapes() {
-        shapeListMutex.lock();
+        //shapeListMutex.lock();
         shapeList.erase(
             std::remove_if(shapeList.begin(),
                         shapeList.end(),
                         [](const std::weak_ptr<Shape>& shape) { return shape.expired(); }),
             shapeList.end());
-        shapeListMutex.unlock();
+        //shapeListMutex.unlock();
     }
 }

@@ -13,10 +13,11 @@ public:
 
 private:
     int swW = 0, swH = 0;
-    std::vector<color_t> swBuffer[3]; // 三重缓冲区
-    int swCur = 1, swLast = 0;
+    std::vector<color_t> swBuffer;
+    //std::vector<color_t> swBuffer[3]; // 三重缓冲区
+    //int swCur = 1, swLast = 0;
     GLuint swTex = 0;
-    std::mutex bufferMutex; // 保护双缓冲区的互斥锁
+    //std::mutex bufferMutex; // 保护双缓冲区的互斥锁
 
 public:
     // 初始化像素缓冲区
@@ -26,7 +27,7 @@ public:
     void ClearCurrentBuffer();
 
     // 切换缓冲区
-    void SwapBuffers();
+    // void SwapBuffers();
 
     // CPU 端写像素
     void SetPixel(int x, int y, color_t r, color_t g, color_t b, color_t a = 255);

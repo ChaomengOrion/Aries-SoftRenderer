@@ -55,6 +55,13 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     }
 }
 
+// 鼠标滚轮回调
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+    if (g_app)
+        g_app->ProcessMouseScroll(yoffset);
+}
+
 // Main code
 int main(int, char**) {
     glfwSetErrorCallback(glfw_error_callback);
@@ -143,6 +150,7 @@ int main(int, char**) {
     // 注册鼠标回调，覆盖默认的鼠标回调
     glfwSetCursorPosCallback(window, mouse_cursor_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a
@@ -172,9 +180,7 @@ int main(int, char**) {
         ImGui::NewFrame();
 
         // Rendering
-        int display_w, display_h;
-        glfwGetFramebufferSize(config->window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
+        glViewport(0, 0, config->width, config->height);
         glClearColor(config->clear_color.x * config->clear_color.w,
             config->clear_color.y * config->clear_color.w,
             config->clear_color.z * config->clear_color.w,
@@ -182,7 +188,7 @@ int main(int, char**) {
             glClear(GL_COLOR_BUFFER_BIT);
 
         // 执行更新
-        app.OnUpdate();
+        app.OnUpdate(*config);
         
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

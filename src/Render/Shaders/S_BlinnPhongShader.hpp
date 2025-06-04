@@ -17,6 +17,23 @@ namespace aries::shader {
         Vector2f uv;         // 纹理坐标
     };
 
+    
+    template<> // 特化ShaderProperty类型
+    struct ShaderProperty<class BlinnPhongShader> {
+        sptr<Texture> texture; // 纹理
+
+        Vector3f ambient = Vector3f(1.f, 1.f, 1.f); // 环境光
+        float ambientIntensity = 0.43f; // 环境光强度
+
+        Vector3f diffuse = Vector3f(1.f, 1.f, 1.f); // 漫反射光
+        float diffuseIntensity = 0.47f; // 漫反射光强度
+
+        Vector3f specular = Vector3f(1.f, 1.f, 1.f); // 镜面反射光
+        float specularIntensity = 0.1f; // 镜面反射光强度
+
+        float shininess = 64.f; // 高光指数，用于控制高光的锐利程度
+    };
+
     class BlinnPhongShader : public ShaderBase<BlinnPhongShader> {
     public:
         // CRTP实现 - 编译器知道确切类型，可内联优化

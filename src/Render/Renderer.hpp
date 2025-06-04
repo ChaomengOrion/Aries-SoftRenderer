@@ -26,8 +26,7 @@ namespace aries::render {
         float clipW[3];  // 保存透视除法前的 w 值
     };
 
-    class Renderer
-    {
+    class Renderer {
     private:
         int _width, _height;
 
@@ -36,11 +35,15 @@ namespace aries::render {
         //std::vector<Vector3f> _frameBuffer;
         vector<float> _zBuffer;
         sptr<Raster> m_raster;
+        sptr<Camera> m_camera;
+        sptr<Scene> m_scene;
 
     public:
         Renderer() = delete;
-        
+
         Renderer(sptr<Raster> raster, int w, int h);
+
+        void SetCameraAndScene(sptr<Camera> camera, sptr<Scene> scene);
 
         void Clear(); // 清除缓存
 
@@ -51,30 +54,37 @@ namespace aries::render {
 
         static Matrix4f GetModelMatrix(const Model& o);
 
-        static Matrix4f GetViewMatrix(Camera& c);
+        Matrix4f GetViewMatrix();
 
-        static Matrix4f GetClipMatrix(const Camera& c);
+        Matrix4f GetClipMatrix();
+
+        // 绘制一条3D线段
+        void DrawLine3D(Vector3f start, Vector3f end, Vector3f color, bool ignoreDepthTest = false);
+
+        // 绘制坐标系
+        void DrawCoordinateSystem(float axisLength = 3.0f, bool showGrid = true, float gridSize = 0.1f, int gridCount = 20);
 
         template<ShaderConcept ShaderT> // 顶点着色器
-        vector<PipelineFragmentData<ShaderT>> VertexShaderWith(vector<sptr<Shape>>& shapeList, sptr<Scene>& scene, sptr<Camera>& cam, uint64_t& triangleCount) { 
+        vector<PipelineFragmentData<ShaderT>> VertexShaderWith(vector<sptr<Shape>>& shapeList, uint64_t& triangleCount) { 
             static uint64_t lastTriangleCount = 0;
 
             // a2v → v2f → 组装 TriangleData 列表
             vector<PipelineFragmentData<ShaderT>> prims;
             prims.reserve(lastTriangleCount * 1.2f); // 预分配空间，避免频繁扩容，实测能加速顶点着色速度很多
 
-            Matrix4f mat_v = GetViewMatrix(*cam);
+            Matrix4f mat_model_to_view = GetViewMatrix();
+            Matrix4f mat_view_to_clip = GetClipMatrix();
 
             for (auto shape : shapeList) {
-                Matrix4f view = mat_v * GetModelMatrix(*shape->model);
+                Matrix4f view = mat_model_to_view * GetModelMatrix(*shape->model);
 
                 auto shaderPropertyPtr = &static_cast<MaterialBase<ShaderT>*>(shape->material.get())->property;
 
                 // 构造顶点着色器 Payload
                 VertexPaylod<ShaderT> vp {
-                    .camera = cam.get(),
+                    .camera = m_camera.get(),
                     .view = view,
-                    .mvp = GetClipMatrix(*cam) * view, 
+                    .mvp = mat_view_to_clip * view, 
                     .property = shaderPropertyPtr
                 };
 
@@ -91,8 +101,8 @@ namespace aries::render {
                     // 装配到 TriangleData
                     PipelineFragmentData<ShaderT> pd;
                     pd.fragmentPayload = {
-                        .scene = scene.get(),
-                        .camera = cam.get(),
+                        .scene = m_scene.get(),
+                        .camera = m_camera.get(),
                         .view = view,
                         .property = shaderPropertyPtr
                     };
@@ -212,7 +222,7 @@ namespace aries::render {
                             };
 
                             //* 判断深度值
-                            float theZ = Interpolate(frag[0].viewport.z(), frag[1].viewport.z(), frag[2].viewport.z());
+                            float theZ = frag[0].viewport.z() * a + frag[1].viewport.z() * b + frag[2].viewport.z() * c; //? 深度值本来就算NDC空间的，所以不用透视插值
 
                             int idx = GetPixelIndex(x, y);
 
@@ -304,7 +314,7 @@ namespace aries::render {
 
     public:
         // 使用目标着色器类型渲染
-        void RenderWithShader(ShaderType type, vector<sptr<Shape>>& shapeList, sptr<Scene>& scene, sptr<Camera>& cam, uint64_t& triangleCount);
+        void RenderWithShader(ShaderType type, vector<sptr<Shape>>& shapeList, uint64_t& triangleCount);
     };
 
     // 特化 - 递归处理类型列表

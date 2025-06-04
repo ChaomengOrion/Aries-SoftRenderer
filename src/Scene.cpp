@@ -27,10 +27,10 @@ namespace aries::scene {
 
     void Scene::ClearObjects() { // TODO
         std::cout << "[Scene] 清空场景中的所有模型和形状。" << std::endl;
-        pipeline->shapeListMutex.lock();
+        //pipeline->shapeListMutex.lock();
         models.clear();
         pipeline->shapeList.clear(); // 清空管线中的形状列表
-        pipeline->shapeListMutex.unlock();
+        //pipeline->shapeListMutex.unlock();
     }
 
     // 获取场景中的模型

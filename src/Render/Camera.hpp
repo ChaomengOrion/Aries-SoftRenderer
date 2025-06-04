@@ -18,7 +18,7 @@ struct Camera
 	float Far;
 	float AspectRatio;
 
-	Vector3f eluaAngle = Vector3f(-90.f, 0.f, -180.f); // 欧拉角，单位为度
+	Vector3f eluaAngle = Vector3f(0.f, 0.f, 0.f); // 欧拉角，单位为度
 	// 这里的欧拉角定义为：
 	// Yaw: 绕Y轴旋转（水平角度）
 	// Pitch: 绕X轴旋转（垂直角度）
@@ -32,14 +32,14 @@ struct Camera
 		float rollRad  = eluaAngle.z() * M_PI / 180.0f;
 
 		Vector3f front;
-		front.x() = cosf(pitchRad) * cosf(yawRad);
+		front.x() = cosf(pitchRad) * -sinf(yawRad);
 		front.y() = sinf(pitchRad);
-		front.z() = cosf(pitchRad) * sinf(yawRad);
+		front.z() = cosf(pitchRad) * -cosf(yawRad);
 		Direction = front.normalized();
 
 		Vector3f worldUp(0.0f, 1.0f, 0.0f);
 		Vector3f right = Direction.cross(worldUp).normalized();
 		Vector3f rolledRight = cosf(rollRad) * right + sinf(rollRad) * worldUp;
-		Up = Direction.cross(rolledRight).normalized();
+		Up = rolledRight.cross(Direction).normalized();
 	}
 };

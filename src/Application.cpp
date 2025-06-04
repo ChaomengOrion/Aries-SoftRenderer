@@ -17,22 +17,24 @@ namespace aries {
         scene->SetTestLight(); // 设置测试光源
 
         
-        if (!renderThreadRunning) {
+        /*if (!renderThreadRunning) {
             StartRenderThread(); // 启动渲染线程
-        }
+        }*/
     }
 
-    void Application::StartRenderThread() {
+    /*void Application::StartRenderThread() {
+        //! temp
+        return; // 暂时禁用渲染线程
         renderThreadRunning = true;
         renderThread = std::thread([this]() {
             while (renderThreadRunning) {
                 pipeline->Draw(scene, scene->GetCamera());
             }
         });
-    }
+    }*/
 
-    void Application::OnUpdate() {
-        auto config = SharedConfigManager::GetConfig();
+    void Application::OnUpdate(SharedConfig& config) {
+        const float deltaTime = 1.0f / config.io.Framerate;
 
         static bool show_another_window, show_config_window;
         {
@@ -47,13 +49,13 @@ namespace aries {
                             &show_config_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
 
-            ImGui::Text("windows width: %d, height: %d", config->width, config->height);
-            ImGui::Text("framebuffer width: %d, height: %d", config->framebuffer_width, config->framebuffer_height);
+            ImGui::Text("windows width: %d, height: %d", config.width, config.height);
+            ImGui::Text("framebuffer width: %d, height: %d", config.framebuffer_width, config.framebuffer_height);
 
             ImGui::SliderFloat(
                 "float", &f, 0.0f, 1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
             ImGui::ColorEdit3("clear color",
-                            (float*)&config->clear_color); // Edit 3 floats representing a color
+                            (float*)&config.clear_color); // Edit 3 floats representing a color
 
             if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return
                                         // true when edited/activated)
@@ -61,15 +63,17 @@ namespace aries {
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
 
+            ImGui::Checkbox("显示坐标系", &pipeline->showCoordinateSystem);
+
             ImGui::Text("三角形数量: %lld", pipeline->triangleCount);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / config->io.Framerate, config->io.Framerate);
-            ImGui::Text("Pipeline Render FPS %.3f ms/frame (%.1f FPS)", 1000.f * pipeline->frameTime, 1.f / pipeline->frameTime);
-            ImGui::Checkbox("启用渲染线程", &renderThreadRunning);
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / config.io.Framerate, config.io.Framerate);
+            ImGui::Text("Pipeline current render FPS %.3f ms/frame (%.1f FPS)", 1000.f * pipeline->frameTime, 1.f / pipeline->frameTime);
+            /*ImGui::Checkbox("启用渲染线程", &renderThreadRunning);
             if (renderThreadRunning && !renderThread.joinable()) {
                 StartRenderThread(); // 确保渲染线程在运行
             } else if (!renderThreadRunning && renderThread.joinable()) {
                 renderThread.join(); // 等待渲染线程结束
-            }
+            }*/
             ImGui::End();
         }
 
@@ -98,23 +102,33 @@ namespace aries {
 
         auto camera = scene->GetCamera();
         
+        // 检测键盘输入，移动相机
+        if (!config.io.WantCaptureKeyboard) {
+            const float cameraSpeed = 2.0f * deltaTime; // 每秒移动2个单位
+            if (glfwGetKey(config.window, GLFW_KEY_W) == GLFW_PRESS)
+                camera->Position += Vector4f(camera->Up.x(), camera->Up.y(), camera->Up.z(), 0.f) * cameraSpeed;
+            if (glfwGetKey(config.window, GLFW_KEY_S) == GLFW_PRESS)
+                camera->Position -= Vector4f(camera->Up.x(), camera->Up.y(), camera->Up.z(), 0.f) * cameraSpeed;
+            const Vector3f right = camera->Direction.cross(Vector3f(0.f, 1.f, 0.f)).normalized();
+            if (glfwGetKey(config.window, GLFW_KEY_A) == GLFW_PRESS)
+                camera->Position -= Vector4f(right.x(), right.y(), right.z(), 0.f) * cameraSpeed;
+            if (glfwGetKey(config.window, GLFW_KEY_D) == GLFW_PRESS)
+                camera->Position += Vector4f(right.x(), right.y(), right.z(), 0.f) * cameraSpeed;
+        }
+
         // 3. Show another simple window.
         if (show_config_window) {
             ImGui::Begin("Config Window", &show_config_window);
-            static float cameraPos[3] = {0, 0, 10};
 
             const float PI = std::numbers::pi_v<float>;
 
-            ImGui::DragFloat3("Camera Position", cameraPos, 0.1f);
+            ImGui::DragFloat3("Camera Position", camera->Position.data(), 0.1f);
             ImGui::SliderFloat("Yaw   (°)",   &camera->eluaAngle.x(),   -180.0f, 180.0f);
             ImGui::SliderFloat("Pitch (°)",   &camera->eluaAngle.y(), -89.0f,   89.0f);
             ImGui::SliderFloat("Roll  (°)",   &camera->eluaAngle.z(),  -180.0f, 180.0f);
             ImGui::SliderFloat("FOV (°)", &camera->Fov, 1.0f, 180.0f);
             ImGui::InputFloat("近平面裁剪", &camera->Near);
             ImGui::InputFloat("远平面裁剪", &camera->Far);
-
-            // 更新相机位置
-            camera->Position = Vector4f(cameraPos[0], cameraPos[1], cameraPos[2], 1.0f);
 
             // 光源调整
             auto light = scene->mainLight;
@@ -141,7 +155,7 @@ namespace aries {
             if (scene->models.empty()) {
                 ImGui::Text("当前场景没有模型");
             } else {
-                static float shininess = 8.f; // 默认高光系数
+                static float shininess = 64.f; // 默认高光系数
                 static float ambientIntensity = 0.43f; // 默认环境光强度
                 static float ambientColor[3] = {1.0f, 1.0f, 1.0f}; // 默认环境光颜色
                 static float diffuseIntensity = 0.47f; // 默认漫反射强度
@@ -182,7 +196,9 @@ namespace aries {
             if (ImGui::Button("Close Me")) show_config_window = false;
             ImGui::End();
         }
-        pipeline->OnUpdate();
+
+        pipeline->Render(scene, scene->GetCamera());
+        pipeline->Draw();
     }
 
     void Application::LoadModel(const std::string& filename) {
@@ -245,8 +261,15 @@ namespace aries {
             float pitch = camera->eluaAngle.y();
             
             // 累加偏移量
-            yaw += xoffset;
+            yaw -= xoffset;
             pitch += yoffset;
+
+            // 保持Yaw在[-180, 180]范围内
+            while (yaw > 180.0f)
+                yaw -= 360.0f;
+
+            while (yaw < -180.0f)
+                yaw += 360.0f;
             
             // 限制俯仰角防止翻转
             if (pitch > 89.0f)
@@ -257,5 +280,18 @@ namespace aries {
             camera->eluaAngle.x() = yaw;   // 更新相机的Yaw
             camera->eluaAngle.y() = pitch; // 更新相机的Pitch
         }
+    }
+
+    void Application::ProcessMouseScroll(double yoffset) {
+        auto config = SharedConfigManager::GetConfig();
+        
+        // 如果ImGui正在使用鼠标，则不处理鼠标输入
+        if (config->io.WantCaptureMouse)
+            return;
+        
+        // 滚轮滚动时，相机前后移动
+        auto camera = scene->GetCamera();
+        const float scrollSpeed = 0.5f; // 滚轮灵敏度
+        camera->Position += Vector4f(camera->Direction.x(), camera->Direction.y(), camera->Direction.z(), 0.f) * yoffset * scrollSpeed;
     }
 }
