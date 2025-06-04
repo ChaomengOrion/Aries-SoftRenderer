@@ -22,11 +22,18 @@ namespace aries {
         // 渲染线程标志
         bool renderThreadRunning = false;
 
+        // 鼠标控制
+        bool mouseMiddlePressed = false;
+        float lastMouseX = 0.0f;
+        float lastMouseY = 0.0f;
+        float mouseSensitivity = 0.1f; // 鼠标灵敏度
+
     public:
         void Init();
         void StartRenderThread();
         void OnUpdate();
-    private:
         void LoadModel(const std::string& filename);
+        void ProcessMouseInput(double xpos, double ypos);
+        void ProcessMouseButton(int button, int action);
     };
 }

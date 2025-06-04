@@ -10,8 +10,8 @@
 
 namespace aries::shader {
     template<> // 特化v2f类型
-    struct v2f<BlinnPhongShader> {
-        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）
+    struct v2f<class BlinnPhongShader> {
+        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）//* 必须包含
         Vector4f viewPos;    // 视图空间坐标（V * M * pos）
         Vector3f normal;     // 世界/视图空间法线
         Vector2f uv;         // 纹理坐标
@@ -19,11 +19,20 @@ namespace aries::shader {
 
     class BlinnPhongShader : public ShaderBase<BlinnPhongShader> {
     public:
+        // CRTP实现 - 编译器知道确切类型，可内联优化
         constexpr static ShaderType GetTypeImpl() {
             return ShaderType::BlinnPhong; // 返回着色器类型
         }
+        
+        inline static v2f_t VertexShaderImpl(const VertexPaylod_t& paylod, const a2v& data) {
+            v2f_t v2fData;
+            v2fData.viewport = paylod.mvp * data.position; // 计算裁剪空间坐标
+            v2fData.viewPos = paylod.view * data.position; // 计算视图空间坐标
+            v2fData.normal = (paylod.view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
+            v2fData.uv = data.uv; // 直接传递纹理坐标
+            return v2fData;
+        }
 
-        // CRTP实现 - 编译器知道确切类型，可内联优化
         inline static Vector3f FragmentShaderImpl(const FragmentPaylod_t& paylod, const v2f_t& data) {
             auto& property = *paylod.property; // 获取着色器属性
 

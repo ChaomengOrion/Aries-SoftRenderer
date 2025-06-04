@@ -102,37 +102,19 @@ namespace aries {
         if (show_config_window) {
             ImGui::Begin("Config Window", &show_config_window);
             static float cameraPos[3] = {0, 0, 10};
-            // 用欧拉角（Yaw, Pitch, Roll）代替方向向量
-            static float cameraYaw   = -90.0f; // 水平角度，度
-            static float cameraPitch =  0.0f; // 垂直角度，度
-            static float cameraRoll  = -180.f; // 翻滚角度，度
+
+            const float PI = std::numbers::pi_v<float>;
 
             ImGui::DragFloat3("Camera Position", cameraPos, 0.1f);
-            ImGui::SliderFloat("Yaw   (°)",   &cameraYaw,   -180.0f, 180.0f);
-            ImGui::SliderFloat("Pitch (°)",   &cameraPitch, -89.0f,   89.0f);
-            ImGui::SliderFloat("Roll  (°)",   &cameraRoll,  -180.0f, 180.0f);
+            ImGui::SliderFloat("Yaw   (°)",   &camera->eluaAngle.x(),   -180.0f, 180.0f);
+            ImGui::SliderFloat("Pitch (°)",   &camera->eluaAngle.y(), -89.0f,   89.0f);
+            ImGui::SliderFloat("Roll  (°)",   &camera->eluaAngle.z(),  -180.0f, 180.0f);
             ImGui::SliderFloat("FOV (°)", &camera->Fov, 1.0f, 180.0f);
             ImGui::InputFloat("近平面裁剪", &camera->Near);
             ImGui::InputFloat("远平面裁剪", &camera->Far);
 
             // 更新相机位置
-            camera->Position = Vector4f(
-                cameraPos[0], cameraPos[1], cameraPos[2], 1.0f);
-            // 欧拉角转方向向量
-            const float PI = std::numbers::pi_v<float>;
-            float yawRad   = cameraYaw   * PI / 180.0f;
-            float pitchRad = cameraPitch * PI / 180.0f;
-            Vector3f front;
-            front.x() = cosf(pitchRad) * cosf(yawRad);
-            front.y() = sinf(pitchRad);
-            front.z() = cosf(pitchRad) * sinf(yawRad);
-            camera->Direction = front.normalized();
-            // 根据 Roll 角度计算 Up 向量
-            Vector3f worldUp(0.0f, 1.0f, 0.0f);
-            Vector3f right = camera->Direction.cross(worldUp).normalized();
-            float rollRad = cameraRoll * PI / 180.0f;
-            Vector3f rolledRight = cosf(rollRad)*right + sinf(rollRad)*worldUp;
-            camera->Up = camera->Direction.cross(rolledRight).normalized();
+            camera->Position = Vector4f(cameraPos[0], cameraPos[1], cameraPos[2], 1.0f);
 
             // 光源调整
             auto light = scene->mainLight;
@@ -210,6 +192,70 @@ namespace aries {
             scene->AddModel(model);
         } catch (const std::exception& e) {
             std::cerr << "[Application] 加载obj模型失败: " << e.what() << std::endl;
+        }
+    }
+
+    void Application::ProcessMouseButton(int button, int action) {
+        auto config = SharedConfigManager::GetConfig();
+        
+        // 如果ImGui正在使用鼠标，则不处理鼠标输入
+        if (config->io.WantCaptureMouse)
+            return;
+
+        if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+            if (action == GLFW_PRESS) {
+                mouseMiddlePressed = true;
+                
+                // 获取当前鼠标位置作为起始点
+                double xpos, ypos;
+                glfwGetCursorPos(config->window, &xpos, &ypos);
+                lastMouseX = static_cast<float>(xpos);
+                lastMouseY = static_cast<float>(ypos);
+            }
+            else if (action == GLFW_RELEASE) {
+                mouseMiddlePressed = false;
+            }
+        }
+    }
+
+    void Application::ProcessMouseInput(double xpos, double ypos) {
+        auto config = SharedConfigManager::GetConfig();
+        
+        // 如果ImGui正在使用鼠标，则不处理鼠标输入
+        if (config->io.WantCaptureMouse)
+            return;
+            
+        if (mouseMiddlePressed) {
+            // 计算鼠标移动的偏移量
+            auto xoffset = static_cast<float>(xpos - lastMouseX);
+            auto yoffset = static_cast<float>(lastMouseY - ypos); // 反转y轴，因为y坐标是从上到下的
+            
+            lastMouseX = static_cast<float>(xpos);
+            lastMouseY = static_cast<float>(ypos);
+            
+            // 应用鼠标灵敏度
+            xoffset *= mouseSensitivity;
+            yoffset *= mouseSensitivity;
+            
+            // 获取相机
+            auto camera = scene->GetCamera();
+            
+            // 更新相机欧拉角
+            float yaw = camera->eluaAngle.x(); // 初始值与界面保持一致
+            float pitch = camera->eluaAngle.y();
+            
+            // 累加偏移量
+            yaw += xoffset;
+            pitch += yoffset;
+            
+            // 限制俯仰角防止翻转
+            if (pitch > 89.0f)
+                pitch = 89.0f;
+            if (pitch < -89.0f)
+                pitch = -89.0f;
+            
+            camera->eluaAngle.x() = yaw;   // 更新相机的Yaw
+            camera->eluaAngle.y() = pitch; // 更新相机的Pitch
         }
     }
 }

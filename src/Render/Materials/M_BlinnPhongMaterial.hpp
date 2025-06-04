@@ -7,7 +7,6 @@ namespace aries::material {
     public:
         BlinnPhongMaterial(std::string name, sptr<Texture> tex) : MaterialBase(name) {
             property.texture = std::move(tex);
-            shader = std::make_shared<BlinnPhongShader>();
         }
     };
 }

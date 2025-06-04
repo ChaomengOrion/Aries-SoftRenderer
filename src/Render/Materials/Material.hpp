@@ -23,15 +23,15 @@ namespace aries::material {
 
         ShaderProperty<shader_t> property; // 着色器属性
 
-        sptr<shader_t> shader; // 着色器
+        //// sptr<shader_t> shader; // 着色器
 
         ShaderType GetShaderType() const override {
-            return shader->GetType();
+            return ShaderBase<ShaderT>::GetType();
         }
 
-        shader_t& GetShader() const {
+        /* shader_t& GetShader() const {
             return *shader;
-        }
+        }*/
 
         virtual ~MaterialBase() = default;
     };

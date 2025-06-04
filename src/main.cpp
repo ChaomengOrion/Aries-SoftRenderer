@@ -33,6 +33,28 @@ static void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
+aries::Application* g_app = nullptr;
+
+// 鼠标移动回调
+static void mouse_cursor_callback(GLFWwindow* window, double xpos, double ypos) {
+    // 先让ImGui处理事件
+    ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+
+    if (g_app) {
+        g_app->ProcessMouseInput(xpos, ypos);
+    }
+}
+
+// 鼠标按钮回调
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    // 先让ImGui处理事件
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+    
+    if (g_app) {
+        g_app->ProcessMouseButton(button, action);
+    }
+}
+
 // Main code
 int main(int, char**) {
     glfwSetErrorCallback(glfw_error_callback);
@@ -115,7 +137,12 @@ int main(int, char**) {
     SharedConfigManager::BindConfig(config);
 
     aries::Application app;
+    g_app = &app; // 设置全局应用实例
     app.Init();
+
+    // 注册鼠标回调，覆盖默认的鼠标回调
+    glfwSetCursorPosCallback(window, mouse_cursor_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 #ifdef __EMSCRIPTEN__
     // For an Emscripten build we are disabling file-system access, so let's not attempt to do a

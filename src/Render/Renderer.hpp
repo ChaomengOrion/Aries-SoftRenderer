@@ -51,7 +51,7 @@ namespace aries::render {
 
         static Matrix4f GetModelMatrix(const Model& o);
 
-        static Matrix4f GetViewMatrix(const Camera& c);
+        static Matrix4f GetViewMatrix(Camera& c);
 
         static Matrix4f GetClipMatrix(const Camera& c);
 

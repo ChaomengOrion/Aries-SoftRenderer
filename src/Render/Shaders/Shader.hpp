@@ -9,17 +9,14 @@
 #include "../Camera.hpp"
 #include "../Texture.hpp"
 
+#include "ShaderTypes.hpp"
+
 namespace aries::scene {
     class Scene; // 前向声明
 }
 
 namespace aries::shader {
-    enum class ShaderType {
-        BlinnPhong,
-        Texture,
-        PBR,
-        // 其他材质类型...
-    };
+    enum class ShaderType;
 
     template<typename ShaderT>
     struct ShaderProperty { };
@@ -47,13 +44,10 @@ namespace aries::shader {
         Vector2f uv;       // 纹理坐标
     };
 
-    // v2f：顶点着色器输出 & 片元着色器输入
+    // v2f：顶点着色器输出 & 片元着色器输入，可自定义
     template<typename ShaderT>
     struct v2f {
-        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）
-        Vector4f viewPos;    // 视图空间坐标（V * M * pos）
-        Vector3f normal;     // 世界/视图空间法线
-        Vector2f uv;         // 纹理坐标
+        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）//* 必须包含
     };
 
     // 着色器基类使用CRTP模式
@@ -73,14 +67,9 @@ namespace aries::shader {
             return ShaderT::GetTypeImpl();
         }
 
-        // 默认的顶点着色器实现
+        // 默认的顶点着色器实现 - 派生类必须实现
         inline static v2f_t VertexShader(const VertexPaylod_t& paylod, const a2v& data) {
-            v2f_t v2fData;
-            v2fData.viewport = paylod.mvp * data.position; // 计算裁剪空间坐标
-            v2fData.viewPos = paylod.view * data.position; // 计算视图空间坐标
-            v2fData.normal = (paylod.view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
-            v2fData.uv = data.uv; // 直接传递纹理坐标
-            return v2fData;
+            return ShaderT::VertexShaderImpl(paylod, data);
         }
         
         // 静态分派的片元着色器 - 派生类必须实现
@@ -94,6 +83,7 @@ namespace aries::shader {
     concept ShaderConcept = std::derived_from<ShaderT, ShaderBase<ShaderT>> &&
                             requires(ShaderT) {
                                 { ShaderT::GetTypeImpl() } -> std::convertible_to<ShaderType>;
+                                { ShaderT::VertexShaderImpl(std::declval<VertexPaylod<ShaderT>>(), std::declval<a2v>()) } -> std::convertible_to<typename ShaderT::v2f_t>;
                                 { ShaderT::FragmentShaderImpl(std::declval<FragmentPaylod<ShaderT>>(), std::declval<v2f<ShaderT>>()) } -> std::convertible_to<Vector3f>;
                             };
 

@@ -65,7 +65,9 @@ namespace aries::render {
         return move * rZ * rX * rY * scale;
     }
 
-    Matrix4f Renderer::GetViewMatrix(const Camera& c) {
+    Matrix4f Renderer::GetViewMatrix(Camera& c) {
+        c.ApplyEluaAngle(); // 应用欧拉角到摄像机方向和上向量
+
         // 将摄像机移动到原点，然后使用旋转矩阵的正交性让摄像机摆正
         Matrix4f move; // 移动矩阵
         Vector3f right; // 摄像机的x轴

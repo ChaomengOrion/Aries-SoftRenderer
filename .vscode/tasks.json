@@ -1,72 +1,58 @@
-{  
-    "version": "2.0.0",  // JSON 配置文件的版本号  
-    "tasks": [            // 定义一个任务列表  
+{
+    "version": "2.0.0",
+    "tasks": [
         {
-            "label": "Build Aries.exe [release]",  // 任务名称，方便识别  
-            "type": "shell",            // 任务类型，表示这是一个 shell 命令
-            "command": "g++",           // 使用的编译器命令，这里是 g++  
-            "args": [                   // 传递给编译器的参数列表  
-                "-std=c++23",           // 使用 C++23 标准
-                "-I", "${workspaceFolder}/libs/imgui",  // imgui 库的头文件路径  
-                "-I", "${workspaceFolder}/libs/glfw-3.4.bin.WIN64/include", // glfw 库头文件
-                "-I", "${workspaceFolder}/libs/eigen", // eigen 库头文件
-                "-I", "${workspaceFolder}/libs/boost",
-                "-I", "${workspaceFolder}/libs/misc",
-                "${workspaceFolder}/src/*.cpp",
-                "${workspaceFolder}/src/Render/*.cpp",        // 要编译的源文件  
-                "${workspaceFolder}/libs/imgui/*.cpp", // imgui 库的所有实现文件  
-                "-o", "${workspaceFolder}/build/Aries.exe", // 输出的可执行文件路径  
-                "-fopenmp",          // ← 启用 OpenMP
-                "-L", "${workspaceFolder}/libs/glfw-3.4.bin.WIN64/lib-mingw-w64",  // GLFW 库目录  
-                "-l", "glfw3",  // 静态链接 glfw3 库
-                "-l", "opengl32",  // 链接 OpenGL 库
-                "-l", "gdi32",  // 链接 GDI 图形设备接口库
-                "-O2",
-                //"-g3"
-                //"-l", "user32",  // 链接 Windows 用户界面库  
-                //"-l", "ole32",  // 链接 OLE 库  
-                //"-l", "dwmapi",  // 链接 DWM API 库  
-                //"-l", "dxgi", // 链接 DXGI 库  
-                //"-l", "d3d11", // 链接 Direct3D 11 库  
-                //"-l", "d3dcompiler" // 链接 D3D 编译器库 
-            ],  
-            "group": {                 // 任务分组信息  
-                "kind": "build",       // 组的类型为构建  
-                "isDefault": true      // 设定为默认构建任务  
-            }  
-        }, 
-        {  
-            "label": "Build Aries.exe [debug]",  // 任务名称，方便识别  
-            "type": "shell",            // 任务类型，表示这是一个 shell 命令
-            "command": "g++",           // 使用的编译器命令，这里是 g++  
-            "args": [                   // 传递给编译器的参数列表  
-                "-std=c++23",           // 使用 C++23 标准
-                "-I", "${workspaceFolder}/libs/imgui",  // imgui 库的头文件路径  
-                "-I", "${workspaceFolder}/libs/glfw-3.4.bin.WIN64/include", // glfw 库头文件
-                "-I", "${workspaceFolder}/libs/eigen", // eigen 库头文件
-                "-I", "${workspaceFolder}/libs/boost",
-                "-I", "${workspaceFolder}/libs/misc",
-                "${workspaceFolder}/src/*.cpp",
-                "${workspaceFolder}/src/Render/*.cpp",        // 要编译的源文件  
-                "${workspaceFolder}/libs/imgui/*.cpp", // imgui 库的所有实现文件  
-                "-o", "${workspaceFolder}/build/Aries.exe", // 输出的可执行文件路径  
-                "-fopenmp",          // ← 启用 OpenMP
-                "-L", "${workspaceFolder}/libs/glfw-3.4.bin.WIN64/lib-mingw-w64",  // GLFW 库目录  
-                "-l", "glfw3",  // 静态链接 glfw3 库
-                "-l", "opengl32",  // 链接 OpenGL 库
-                "-l", "gdi32",  // 链接 GDI 图形设备接口库
-                "-Og",
-                "-g3"
-                //"-l", "user32",  // 链接 Windows 用户界面库  
-                //"-l", "ole32",  // 链接 OLE 库  
-                //"-l", "dwmapi",  // 链接 DWM API 库  
-                //"-l", "dxgi", // 链接 DXGI 库  
-                //"-l", "d3d11", // 链接 Direct3D 11 库  
-                //"-l", "d3dcompiler" // 链接 D3D 编译器库 
-            ],  
-            "group": {                 // 任务分组信息  
-                "kind": "build",       // 组的类型为构建  
-            }  
-        }  
-    ]  
-}  
+            "label": "xmake build [debug]",
+            "type": "shell",
+            "command": "xmake",
+            "args": [
+                "f",
+                "-m",
+                "debug",
+                "-y",
+                "&&",
+                "xmake"
+            ],
+            "group": "build",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "xmake build [release]",
+            "type": "shell",
+            "command": "xmake",
+            "args": [
+                "f",
+                "-m",
+                "release",
+                "-y",
+                "&&",
+                "xmake"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "xmake run",
+            "type": "shell",
+            "command": "xmake",
+            "args": [
+                "run"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "xmake clean",
+            "type": "shell",
+            "command": "xmake",
+            "args": [
+                "clean"
+            ]
+        }
+    ]
+}

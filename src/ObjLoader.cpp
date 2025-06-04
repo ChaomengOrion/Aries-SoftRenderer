@@ -59,8 +59,6 @@ sptr<Model> ObjLoader::LoadModel(const string& filename) {
             } else {
                 materialPtrs.push_back(std::make_shared<BlinnPhongMaterial>(mat.name, nullptr)); // 如果加载失败，使用空纹理
             }
-
-            //!materialPtrs.back()->shader = std::make_shared<BlinnPhongShader>(); // 设置材质的着色器
         }
     }
 
@@ -78,11 +76,10 @@ sptr<Model> ObjLoader::LoadModel(const string& filename) {
                 out->material = materialPtrs[matId]; // 设置材质球
             } else {
                 std::cerr << "[ObjLoader] 无效的材质ID: " << matId << "，使用默认材质球" << std::endl;
-                // TODO: out->material = std::make_shared<Material>("DefaultMaterial"); // 使用默认材质
-                //!out->material->shader = std::make_shared<PreviewShader>(); // 设置默认材质的着色器
+                out->material = std::make_shared<PreviewMaterial>("DefaultPreviewMaterial"); //* 使用默认材质
             }
         } else {
-            throw std::runtime_error("Shape " + shape.name + " has no material assigned."); // TODO: 这里可以考虑使用默认材质
+            throw std::runtime_error("Shape " + shape.name + " has no material assigned.");
         }
         
         std::cout << "[ObjLoader] 已加载形状: " << out->name << ", 顶点数: " << shape.mesh.indices.size() << std::endl;
