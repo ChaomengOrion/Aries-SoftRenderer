@@ -11,7 +11,7 @@
 namespace aries::shader {
     template<> // 特化v2f类型
     struct v2f<class BlinnPhongShader> {
-        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）//* 必须包含
+        Vector4f screenPos;   // 屏幕空间坐标（viewport * MVP * position）//* 必须包含
         Vector4f viewPos;    // 视图空间坐标（V * M * pos）
         Vector3f normal;     // 世界/视图空间法线
         Vector2f uv;         // 纹理坐标
@@ -43,9 +43,9 @@ namespace aries::shader {
         
         inline static v2f_t VertexShaderImpl(const VertexPaylod_t& paylod, const a2v& data) {
             v2f_t v2fData;
-            v2fData.viewport = paylod.mvp * data.position; // 计算裁剪空间坐标
-            v2fData.viewPos = paylod.view * data.position; // 计算视图空间坐标
-            v2fData.normal = (paylod.view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
+            v2fData.screenPos = paylod.mat_mvp * data.position; // 计算裁剪空间坐标
+            v2fData.viewPos = paylod.mat_view * data.position; // 计算视图空间坐标
+            v2fData.normal = (paylod.mat_view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
             v2fData.uv = data.uv; // 直接传递纹理坐标
             return v2fData;
         }
@@ -64,14 +64,13 @@ namespace aries::shader {
 
             auto light = paylod.scene->mainLight.get();
 
-            [[unlikely]]
-            if (!light || !texture) {
+            if (!light || !texture) [[unlikely]] {
                 return color; // 如果没有光源，直接返回颜色
             }
 
             // Blinn-Phong 着色模型
             Vector3f N = data.normal.normalized(); // 法线，相机空间
-            Vector3f L = -(paylod.view * Vector4f(light->direction.x(), light->direction.y(), light->direction.z(), 0)).head<3>().normalized(); // 光照方向
+            Vector3f L = -(paylod.mat_view * Vector4f(light->direction.x(), light->direction.y(), light->direction.z(), 0)).head<3>().normalized(); // 光照方向
             Vector3f V = -data.viewPos.head<3>().normalized(); // 视线方向
             Vector3f H = (L + V).normalized(); // 半程向量
             float diff = std::max(N.dot(L), 0.0f); // 漫反射分量

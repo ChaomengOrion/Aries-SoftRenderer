@@ -9,7 +9,7 @@
 namespace aries::shader {
     template<> // 特化v2f类型
     struct v2f<class PreviewShader> {
-        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）
+        Vector4f screenPos;   // 屏幕空间坐标（viewport * MVP * position）
         Vector4f viewPos;    // 视图空间坐标（V * M * pos）
         Vector3f normal;     // 世界/视图空间法线
     };
@@ -22,9 +22,9 @@ namespace aries::shader {
 
         inline static v2f_t VertexShaderImpl(const VertexPaylod_t& paylod, const a2v& data) {
             v2f_t v2fData;
-            v2fData.viewport = paylod.mvp * data.position; // 计算裁剪空间坐标
-            v2fData.viewPos = paylod.view * data.position; // 计算视图空间坐标
-            v2fData.normal = (paylod.view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
+            v2fData.screenPos = paylod.mat_mvp * data.position; // 计算裁剪空间坐标
+            v2fData.viewPos = paylod.mat_view * data.position; // 计算视图空间坐标
+            v2fData.normal = (paylod.mat_view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
             return v2fData;
         }
 

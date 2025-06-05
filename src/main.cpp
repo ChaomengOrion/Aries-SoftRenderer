@@ -137,7 +137,7 @@ int main(int, char**) {
     // Main loop
 
     std::shared_ptr<SharedConfig> config = std::make_shared<SharedConfig>(window, io);
-    config->clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f); // 背景剔除色
+    config->clear_color = ImVec4(0.01f, 0.05f, 0.1f, 1.00f); // 背景剔除色
     glfwGetFramebufferSize(window, &config->width, &config->height);
     config->framebuffer_width = config->width;
     config->framebuffer_height = config->height;
@@ -185,7 +185,7 @@ int main(int, char**) {
             config->clear_color.y * config->clear_color.w,
             config->clear_color.z * config->clear_color.w,
             config->clear_color.w);
-            glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         // 执行更新
         app.OnUpdate(*config);

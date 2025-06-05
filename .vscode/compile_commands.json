@@ -1,81 +1,86 @@
 [
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Application.cpp.obj", "src\\Application.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Application.cpp.obj", "src\\Application.cpp"],
   "file": "src\\Application.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
   "file": "src\\main.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\ObjLoader.cpp.obj", "src\\ObjLoader.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\ObjLoader.cpp.obj", "src\\ObjLoader.cpp"],
   "file": "src\\ObjLoader.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Pipeline.cpp.obj", "src\\Pipeline.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Pipeline.cpp.obj", "src\\Pipeline.cpp"],
   "file": "src\\Pipeline.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Scene.cpp.obj", "src\\Scene.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Scene.cpp.obj", "src\\Scene.cpp"],
   "file": "src\\Scene.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\SharedConfig.cpp.obj", "src\\SharedConfig.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\SharedConfig.cpp.obj", "src\\SharedConfig.cpp"],
   "file": "src\\SharedConfig.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Render\\Raster.cpp.obj", "src\\Render\\Raster.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Render\\Raster.cpp.obj", "src\\Render\\Raster.cpp"],
   "file": "src\\Render\\Raster.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Render\\Renderer.cpp.obj", "src\\Render\\Renderer.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Render\\Renderer.cpp.obj", "src\\Render\\Renderer.cpp"],
   "file": "src\\Render\\Renderer.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Render\\Texture.cpp.obj", "src\\Render\\Texture.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\src\\Render\\Texture.cpp.obj", "src\\Render\\Texture.cpp"],
   "file": "src\\Render\\Texture.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui.cpp.obj", "libs\\imgui\\imgui.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui.cpp.obj", "libs\\imgui\\imgui.cpp"],
   "file": "libs\\imgui\\imgui.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_demo.cpp.obj", "libs\\imgui\\imgui_demo.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_demo.cpp.obj", "libs\\imgui\\imgui_demo.cpp"],
   "file": "libs\\imgui\\imgui_demo.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_draw.cpp.obj", "libs\\imgui\\imgui_draw.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_draw.cpp.obj", "libs\\imgui\\imgui_draw.cpp"],
   "file": "libs\\imgui\\imgui_draw.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_impl_glfw.cpp.obj", "libs\\imgui\\imgui_impl_glfw.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_impl_glfw.cpp.obj", "libs\\imgui\\imgui_impl_glfw.cpp"],
   "file": "libs\\imgui\\imgui_impl_glfw.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_impl_opengl3.cpp.obj", "libs\\imgui\\imgui_impl_opengl3.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_impl_opengl3.cpp.obj", "libs\\imgui\\imgui_impl_opengl3.cpp"],
   "file": "libs\\imgui\\imgui_impl_opengl3.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_tables.cpp.obj", "libs\\imgui\\imgui_tables.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_tables.cpp.obj", "libs\\imgui\\imgui_tables.cpp"],
   "file": "libs\\imgui\\imgui_tables.cpp"
 },
 {
   "directory": "e:\\Program_Dev\\SoftRender",
-  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\misc", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_widgets.cpp.obj", "libs\\imgui\\imgui_widgets.cpp"],
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\imgui\\imgui_widgets.cpp.obj", "libs\\imgui\\imgui_widgets.cpp"],
   "file": "libs\\imgui\\imgui_widgets.cpp"
+},
+{
+  "directory": "e:\\Program_Dev\\SoftRender",
+  "arguments": ["g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++23", "-Ilibs", "-Ilibs\\imgui", "-Ilibs\\glfw-3.4.bin.WIN64\\include", "-Ilibs\\eigen", "-Ilibs\\boost", "-Ilibs\\tiny_obj_loader", "-Ilibs\\stb", "-Ilibs\\ImGuiFileDialog", "-Ibuild\\.gens\\Aries\\windows\\x64\\release\\platform\\windows\\idl", "-fexceptions", "-fopenmp", "-DNDEBUG", "-o", "build\\.objs\\Aries\\windows\\x64\\release\\libs\\ImGuiFileDialog\\ImGuiFileDialog.cpp.obj", "libs\\ImGuiFileDialog\\ImGuiFileDialog.cpp"],
+  "file": "libs\\ImGuiFileDialog\\ImGuiFileDialog.cpp"
 }]

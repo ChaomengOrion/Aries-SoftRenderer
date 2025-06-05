@@ -7,8 +7,12 @@
 #include "SharedConfig.hpp"
 #include "ObjLoader.hpp"
 
+#include "ImGuiFileDialog.h"
+
 namespace aries {
     void Application::Init() {
+        SetupImGuiStyle(); // 设置ImGui样式
+
         pipeline = std::make_shared<Pipeline>();
         scene = std::make_shared<Scene>("Test Scene", pipeline);
 
@@ -33,10 +37,31 @@ namespace aries {
         });
     }*/
 
+    void Application::SetupImGuiStyle() {
+        ImGuiStyle& style = ImGui::GetStyle();
+        
+        // 设置暗色主题
+        ImGui::StyleColorsDark();
+        
+        // 自定义颜色
+        ImVec4* colors = style.Colors;
+        colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.1f, 0.95f);
+        colors[ImGuiCol_FrameBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.54f);
+        colors[ImGuiCol_Button] = ImVec4(0.4f, 0.4f, 0.4f, 0.40f);
+        colors[ImGuiCol_ButtonHovered] = ImVec4(0.6f, 0.6f, 0.6f, 1.00f);
+        colors[ImGuiCol_ButtonActive] = ImVec4(0.8f, 0.8f, 0.8f, 1.00f);
+        
+        // 设置圆角
+        style.WindowRounding = 5.0f;
+        style.FrameRounding = 3.0f;
+        style.ScrollbarRounding = 3.0f;
+        style.GrabRounding = 3.0f;
+    }
+
     void Application::OnUpdate(SharedConfig& config) {
         const float deltaTime = 1.0f / config.io.Framerate;
 
-        static bool show_another_window, show_config_window;
+        static bool show_loader_window, show_config_window;
         {
             static float f = 0.0f;
             static int counter = 0;
@@ -47,7 +72,7 @@ namespace aries {
                                                     // strings too)
             ImGui::Checkbox("Config Window",
                             &show_config_window); // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+            ImGui::Checkbox("Another Window", &show_loader_window);
 
             ImGui::Text("windows width: %d, height: %d", config.width, config.height);
             ImGui::Text("framebuffer width: %d, height: %d", config.framebuffer_width, config.framebuffer_height);
@@ -77,26 +102,76 @@ namespace aries {
             ImGui::End();
         }
 
-        // 3. Show another simple window.
-        if (show_another_window) {
-            ImGui::Begin(
-                "Another Window",
-                &show_another_window); // Pass a pointer to our bool variable (the window will have
-                                    // a closing button that will clear the bool when clicked)
+        //* 显示模型加载器窗口
+        if (show_loader_window) {
+            ImGui::Begin("模型加载器", &show_loader_window, ImGuiWindowFlags_AlwaysAutoResize);
 
-            // 显示模型加载
-            ImGui::Text("加载模型");
-            static char filePath[128] = "C:\\Users\\21988\\Downloads\\绝区零安比_爱给网_aigei_com\\无标题.obj";
-            ImGui::InputText("file path", filePath, 128);
-            if (ImGui::Button("Load Model")) {
-                LoadModel(filePath); // 加载模型
+            ImGui::Text("加载 3D 模型文件");
+            ImGui::Separator();
+            
+            // 文件路径输入框
+            static char filePath[512] = R"(F:\绝区零安比\无标题.obj)";
+            ImGui::InputTextWithHint("##filepath", "请输入文件路径或点击浏览选择...", filePath, sizeof(filePath));
+
+            ImGui::SameLine();
+            if (ImGui::Button("浏览文件...")) {
+                // 使用新版本的 FileDialogConfig
+                IGFD::FileDialogConfig config;
+                config.path = "F:\\";  // 设置默认路径
+                config.countSelectionMax = 1;
+                config.flags = ImGuiFileDialogFlags_Modal;
+                
+                // 调用新版本的 OpenDialog
+                ImGuiFileDialog::Instance()->OpenDialog(
+                    "ChooseModelFile",           // key
+                    "选择 3D 模型文件",          // title  
+                    ".obj,.fbx,.dae,.ply,.stl",  // filters
+                    config                       // config
+                );
+            }
+            
+            // 显示文件对话框
+            if (ImGuiFileDialog::Instance()->Display("ChooseModelFile", 
+                ImGuiWindowFlags_None, 
+                ImVec2(800, 600) // 最小尺寸
+                )) {
+                
+                if (ImGuiFileDialog::Instance()->IsOk()) {
+                    std::string selectedFile = ImGuiFileDialog::Instance()->GetFilePathName();
+                    strncpy_s(filePath, selectedFile.c_str(), sizeof(filePath) - 1);
+                    filePath[sizeof(filePath) - 1] = '\0';
+                }
+                ImGuiFileDialog::Instance()->Close();
+            }
+            
+            ImGui::Separator();
+            
+            if (ImGui::Button("加载模型")) {
+                if (strlen(filePath) > 0) {
+                    LoadModel(filePath);
+                }
             }
 
-            if (ImGui::Button("Clear Objects")) {
-                scene->ClearObjects(); // 清除当前场景中的所有对象
+            ImGui::SameLine();
+            if (ImGui::Button("清除所有模型")) {
+                scene->ClearObjects();
+            }
+            
+            ImGui::Separator();
+            
+            // 显示已加载的模型信息
+            if (!scene->models.empty()) {
+                ImGui::Text("已加载的模型:");
+                for (const auto& [name, model] : scene->models) {
+                    ImGui::BulletText("%s (%zu shapes)", name.c_str(), model->shapes.size());
+                }
+            } else {
+                ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "暂无已加载的模型");
             }
 
-            if (ImGui::Button("Close Me")) show_another_window = false;
+            if (ImGui::Button("关闭窗口")) 
+                show_loader_window = false;
+            
             ImGui::End();
         }
 
@@ -180,14 +255,14 @@ namespace aries {
                     // 更新模型的材质
                     for (auto& shape : model->shapes) {
                         if (autoApplyMaterial || (ImGui::Text("name: %s", shape->name.c_str()), ImGui::Button(("Update Material##" + shape->name).c_str()))) {
-                            auto mat = std::static_pointer_cast<BlinnPhongMaterial>(shape->material);
+                            /*auto mat = std::static_pointer_cast<BlinnPhongMaterial>(shape->material);
                             mat->property.shininess = shininess;
                             mat->property.ambientIntensity = ambientIntensity;
                             mat->property.diffuseIntensity = diffuseIntensity;
                             mat->property.specularIntensity = specularIntensity;
                             mat->property.ambient = Vector3f(ambientColor[0], ambientColor[1], ambientColor[2]);
                             mat->property.diffuse = Vector3f(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
-                            mat->property.specular = Vector3f(specularColor[0], specularColor[1], specularColor[2]);
+                            mat->property.specular = Vector3f(specularColor[0], specularColor[1], specularColor[2]);*/
                         }
                     }
                 }

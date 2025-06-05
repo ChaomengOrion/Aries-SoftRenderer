@@ -24,8 +24,8 @@ namespace aries::shader {
     template<typename ShaderT>
     struct VertexPaylod {
         Camera* camera; // 相机
-        Matrix4f view; // 模型矩阵
-        Matrix4f mvp; // 模型视图投影矩阵
+        Matrix4f mat_view; // 模型矩阵
+        Matrix4f mat_mvp; // 模型视图投影矩阵
         ShaderProperty<ShaderT>* property; // 着色器属性
     };
 
@@ -33,7 +33,7 @@ namespace aries::shader {
     struct FragmentPaylod {
         scene::Scene* scene; // 场景
         Camera* camera; // 相机
-        Matrix4f view; // 模型矩阵
+        Matrix4f mat_view; // 模型矩阵
         ShaderProperty<ShaderT>* property; // 着色器属性
     };
 
@@ -47,7 +47,7 @@ namespace aries::shader {
     // v2f：顶点着色器输出 & 片元着色器输入，可自定义
     template<typename ShaderT>
     struct v2f {
-        Vector4f viewport;   // 屏幕空间坐标（viewport * MVP * position）//* 必须包含
+        Vector4f screenPos;   // 屏幕空间坐标（viewport * MVP * position）//* 必须包含
     };
 
     // 着色器基类使用CRTP模式

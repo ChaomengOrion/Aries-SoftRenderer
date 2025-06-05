@@ -44,7 +44,10 @@
             "group": {
                 "kind": "test",
                 "isDefault": true
-            }
+            },
+            "dependsOn": [
+                "xmake build [release]"
+            ],
         },
         {
             "label": "xmake clean",

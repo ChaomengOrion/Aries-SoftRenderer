@@ -42,11 +42,14 @@ else
 end
 
 -- 添加包含目录
+add_includedirs("libs")
 add_includedirs("libs/imgui")
 add_includedirs("libs/glfw-3.4.bin.WIN64/include")
 add_includedirs("libs/eigen")
 add_includedirs("libs/boost")
-add_includedirs("libs/misc")
+add_includedirs("libs/tiny_obj_loader")
+add_includedirs("libs/stb")
+add_includedirs("libs/ImGuiFileDialog")
 
 -- 定义目标
 target("Aries")
@@ -56,6 +59,7 @@ target("Aries")
     add_files("src/*.cpp")
     add_files("src/Render/*.cpp")
     add_files("libs/imgui/*.cpp")
+    add_files("libs/ImGuiFileDialog/*.cpp")
     
     -- 添加库路径和链接库
     if is_plat("windows") then

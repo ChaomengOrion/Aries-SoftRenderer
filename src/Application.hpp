@@ -30,6 +30,7 @@ namespace aries {
 
     public:
         void Init();
+        void SetupImGuiStyle();
         // void StartRenderThread();
         void OnUpdate(SharedConfig& config);
         void LoadModel(const std::string& filename);

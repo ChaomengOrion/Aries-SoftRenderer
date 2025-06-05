@@ -2,7 +2,7 @@
 /// Date: 2025/06/01
 /// Author: ChaomengOrion
 
-#define STB_IMAGE_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION // IMGuiFileDialog 定义了这个
 #include "stb_image.h"
 #include "Texture.hpp"
 #include <cmath>
