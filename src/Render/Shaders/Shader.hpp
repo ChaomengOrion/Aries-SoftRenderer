@@ -22,19 +22,15 @@ namespace aries::shader {
     struct ShaderProperty { };
 
     template<typename ShaderT>
-    struct VertexPaylod {
-        Camera* camera; // 相机
-        Matrix4f mat_view; // 模型矩阵
-        Matrix4f mat_mvp; // 模型视图投影矩阵
-        ShaderProperty<ShaderT>* property; // 着色器属性
-    };
-
-    template<typename ShaderT>
-    struct FragmentPaylod {
+    struct Payload {
         scene::Scene* scene; // 场景
         Camera* camera; // 相机
-        Matrix4f mat_view; // 模型矩阵
-        ShaderProperty<ShaderT>* property; // 着色器属性
+    };
+
+    struct Matrixs {
+        Matrix4f mat_model; // 模型->世界矩阵
+        Matrix4f mat_view; // 模型->视图矩阵
+        Matrix4f mat_mvp; // 模型->NDC矩阵
     };
 
     // a2v：顶点着色器输入
@@ -58,9 +54,9 @@ namespace aries::shader {
         friend ShaderT; // 只有继承了ShaderBase<ShaderT>的ShaderT类可以访问私有构造函数
 
     public:
-        using FragmentPaylod_t = FragmentPaylod<ShaderT>; // 片元着色器输入
-        using VertexPaylod_t = VertexPaylod<ShaderT>; // 顶点着色器输入
+        using payload_t = Payload<ShaderT>; // 着色器输入数据类型
         using v2f_t = v2f<ShaderT>; // 顶点着色器输出 & 片元着色器输入
+        using property_t = ShaderProperty<ShaderT>; // 着色器属性类型
 
         // 获取着色器类型 - 派生类必须实现
         constexpr static ShaderType GetType() {
@@ -68,14 +64,22 @@ namespace aries::shader {
         }
 
         // 默认的顶点着色器实现 - 派生类必须实现
-        inline static v2f_t VertexShader(const VertexPaylod_t& paylod, const a2v& data) {
-            return ShaderT::VertexShaderImpl(paylod, data);
+        inline static v2f_t VertexShader(const a2v& data, const Matrixs& matrixs, const property_t& property) {
+            return ShaderT::VertexShaderImpl(data, matrixs, property);
         }
         
         // 静态分派的片元着色器 - 派生类必须实现
-        inline static Vector3f FragmentShader(const FragmentPaylod_t& paylod, const v2f_t& data) {
+        inline static Vector3f FragmentShader(const v2f_t& data, const Matrixs& matrixs, const property_t& property) {
             // 静态分派到实际的实现
-            return ShaderT::FragmentShaderImpl(paylod, data);
+            return ShaderT::FragmentShaderImpl(data, matrixs, property);
+        }
+
+        // 可选的片元着色器前处理，可以缓存内容
+        inline static void BeforeShader(const payload_t& payload) {
+            // 检查子类有没有实现
+            if constexpr (requires { ShaderT::BeforeShaderImpl(payload); }) {
+                ShaderT::BeforeShaderImpl(payload);
+            }
         }
     };
 
@@ -83,7 +87,7 @@ namespace aries::shader {
     concept ShaderConcept = std::derived_from<ShaderT, ShaderBase<ShaderT>> &&
                             requires(ShaderT) {
                                 { ShaderT::GetTypeImpl() } -> std::convertible_to<ShaderType>;
-                                { ShaderT::VertexShaderImpl(std::declval<VertexPaylod<ShaderT>>(), std::declval<a2v>()) } -> std::convertible_to<typename ShaderT::v2f_t>;
-                                { ShaderT::FragmentShaderImpl(std::declval<FragmentPaylod<ShaderT>>(), std::declval<v2f<ShaderT>>()) } -> std::convertible_to<Vector3f>;
+                                { ShaderT::VertexShaderImpl(std::declval<a2v>(), std::declval<Matrixs>(), std::declval<typename ShaderT::property_t>()) } -> std::convertible_to<typename ShaderT::v2f_t>;
+                                { ShaderT::FragmentShaderImpl(std::declval<v2f<ShaderT>>(), std::declval<Matrixs>(), std::declval<typename ShaderT::property_t>()) } -> std::convertible_to<Vector3f>;
                             };
 }

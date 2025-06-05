@@ -3,8 +3,6 @@
 #include <tiny_obj_loader.h>
 #include "Render/Model.hpp"
 #include "Render/Shape.hpp"
-#include "Render/Materials/M_BlinnPhongMaterial.hpp" // TODO: 这里可以根据需要添加其他材质类型
-#include "Render/Materials/M_PreviewMaterial.hpp" // TODO: 这里可以根据需要添加其他材质类型
 
 using namespace aries::model;
 

@@ -15,21 +15,22 @@ namespace aries::shader {
     };
 
     class PreviewShader : public ShaderBase<PreviewShader> {
+
     public:
         constexpr static ShaderType GetTypeImpl() {
             return ShaderType::Preview; // 返回着色器类型
         }
 
-        inline static v2f_t VertexShaderImpl(const VertexPaylod_t& paylod, const a2v& data) {
+        inline static v2f_t VertexShaderImpl(const a2v& data, const Matrixs& matrixs, const property_t&) {
             v2f_t v2fData;
-            v2fData.screenPos = paylod.mat_mvp * data.position; // 计算裁剪空间坐标
-            v2fData.viewPos = paylod.mat_view * data.position; // 计算视图空间坐标
-            v2fData.normal = (paylod.mat_view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
+            v2fData.screenPos = matrixs.mat_mvp * data.position; // 计算裁剪空间坐标
+            v2fData.viewPos = matrixs.mat_view * data.position; // 计算视图空间坐标
+            v2fData.normal = (matrixs.mat_view * Vector4f(data.normal.x(), data.normal.y(), data.normal.z(), 0.0f)).template head<3>().normalized(); // 法线转换
             return v2fData;
         }
 
         // CRTP实现 - 编译器知道确切类型，可内联优化
-        inline static Vector3f FragmentShaderImpl(const FragmentPaylod_t& paylod, const v2f_t& data) {
+        inline static Vector3f FragmentShaderImpl(const v2f_t& data, const Matrixs&, const property_t&) {
             Vector3f N = data.normal;
             Vector3f L = -(data.viewPos.head<3>()).normalized();
 

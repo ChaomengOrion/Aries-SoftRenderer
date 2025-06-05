@@ -8,7 +8,7 @@
 
 class NormalTestShader : public Shader
 {
-    Vector3f FragmentShader([[maybe_unused]] FragmentPaylod paylod, v2f& data) override {
+    Vector3f FragmentShader([[maybe_unused]] FragmentPayload payload, v2f& data) override {
         // TEST
         Vector3f viewNormal = data.normal;
         Vector3f returnColor = (viewNormal + Vector3f(1.0f, 1.0f, 1.0f)) / 2.0f;

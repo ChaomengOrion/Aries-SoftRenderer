@@ -1,0 +1,65 @@
+Date : 2025-06-05 19:18:06
+Directory : e:\Program_Dev\SoftRender\src
+Total : 36 files,  1702 codes, 506 comments, 470 blanks, all 2678 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         36 |      1,702 |        506 |        470 |      2,678 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                    | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                       |         36 |      1,702 |        506 |        470 |      2,678 |
+| . (Files)                                                               |         12 |        725 |        162 |        207 |      1,094 |
+| Render                                                                  |         24 |        977 |        344 |        263 |      1,584 |
+| Render (Files)                                                          |         13 |        845 |        147 |        221 |      1,213 |
+| Render\Materials                                                        |          3 |         41 |          4 |         15 |         60 |
+| Render\Shaders                                                          |          8 |         91 |        193 |         27 |        311 |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| e:\Program_Dev\SoftRender\src\Application.cpp                           | C++      |        245 |         58 |         69 |        372 |
+| e:\Program_Dev\SoftRender\src\Application.hpp                           | C++      |         27 |          7 |          7 |         41 |
+| e:\Program_Dev\SoftRender\src\ImguiCommon.hpp                           | C++      |         10 |          3 |          2 |         15 |
+| e:\Program_Dev\SoftRender\src\ObjLoader.cpp                             | C++      |         99 |          7 |         26 |        132 |
+| e:\Program_Dev\SoftRender\src\ObjLoader.hpp                             | C++      |         13 |          0 |          3 |         16 |
+| e:\Program_Dev\SoftRender\src\Pipeline.cpp                              | C++      |         61 |         18 |         20 |         99 |
+| e:\Program_Dev\SoftRender\src\Pipeline.hpp                              | C++      |         25 |          4 |         14 |         43 |
+| e:\Program_Dev\SoftRender\src\Render\Camera.hpp                         | C++      |         33 |          5 |          7 |         45 |
+| e:\Program_Dev\SoftRender\src\Render\CommonHeader.hpp                   | C++      |         15 |          0 |          4 |         19 |
+| e:\Program_Dev\SoftRender\src\Render\Light.hpp                          | C++      |         14 |          0 |          4 |         18 |
+| e:\Program_Dev\SoftRender\src\Render\Materials\M_BlinnPhongMaterial.hpp | C++      |         10 |          0 |          2 |         12 |
+| e:\Program_Dev\SoftRender\src\Render\Materials\M_PreviewMaterial.hpp    | C++      |          8 |          0 |          2 |         10 |
+| e:\Program_Dev\SoftRender\src\Render\Materials\Material.hpp             | C++      |         23 |          4 |         11 |         38 |
+| e:\Program_Dev\SoftRender\src\Render\Model.hpp                          | C++      |         21 |          0 |          7 |         28 |
+| e:\Program_Dev\SoftRender\src\Render\Raster.cpp                         | C++      |         54 |         15 |         10 |         79 |
+| e:\Program_Dev\SoftRender\src\Render\Raster.hpp                         | C++      |         18 |         13 |          9 |         40 |
+| e:\Program_Dev\SoftRender\src\Render\Renderer.cpp                       | C++      |        168 |         19 |         48 |        235 |
+| e:\Program_Dev\SoftRender\src\Render\Renderer.hpp                       | C++      |        360 |         72 |         95 |        527 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\S_BlinnPhongShader.hpp     | C++      |          8 |         79 |          3 |         90 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\S_NormalTestShader.hpp     | C++      |          0 |         17 |          0 |         17 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\S_NullShader.hpp           | C++      |          0 |         15 |          0 |         15 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\S_PreviewShader.hpp        | C++      |         29 |          4 |          8 |         41 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\S_TextureShader.hpp        | C++      |          0 |         28 |          0 |         28 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\Shader.hpp                 | C++      |         34 |         44 |         11 |         89 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\ShaderRegister.hpp         | C++      |         11 |          5 |          4 |         20 |
+| e:\Program_Dev\SoftRender\src\Render\Shaders\ShaderTypes.hpp            | C++      |          9 |          1 |          1 |         11 |
+| e:\Program_Dev\SoftRender\src\Render\Shape.hpp                          | C++      |         17 |          3 |          9 |         29 |
+| e:\Program_Dev\SoftRender\src\Render\Texture.cpp                        | C++      |         29 |          6 |          5 |         40 |
+| e:\Program_Dev\SoftRender\src\Render\Texture.hpp                        | C++      |         13 |          7 |          5 |         25 |
+| e:\Program_Dev\SoftRender\src\Render\TextureManager.hpp                 | C++      |         38 |          7 |          8 |         53 |
+| e:\Program_Dev\SoftRender\src\Render\Triangle.hpp                       | C++      |         65 |          0 |         10 |         75 |
+| e:\Program_Dev\SoftRender\src\Scene.cpp                                 | C++      |         59 |          6 |          9 |         74 |
+| e:\Program_Dev\SoftRender\src\Scene.hpp                                 | C++      |         29 |          4 |         14 |         47 |
+| e:\Program_Dev\SoftRender\src\SharedConfig.cpp                          | C++      |          8 |          3 |          4 |         15 |
+| e:\Program_Dev\SoftRender\src\SharedConfig.hpp                          | C++      |         18 |          3 |          4 |         25 |
+| e:\Program_Dev\SoftRender\src\main.cpp                                  | C++      |        131 |         49 |         35 |        215 |
+| Total                                                                   |          |      1,702 |        506 |        470 |      2,678 |
++-------------------------------------------------------------------------+----------+------------+------------+------------+------------+

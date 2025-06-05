@@ -2,6 +2,7 @@
 
 namespace aries::shader {
     enum class ShaderType {
+        ShadowedBlinnPhong,
         BlinnPhong,
         Preview,
         Texture,

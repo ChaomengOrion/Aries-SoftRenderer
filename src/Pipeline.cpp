@@ -22,7 +22,7 @@ namespace aries::render {
     }
 
     void Pipeline::Render(sptr<Scene> scene, sptr<Camera> cam) {
-        renderer->SetCameraAndScene(std::move(cam), std::move(scene));
+        renderer->SetCameraAndScene(cam, scene);
 
         static auto lastFrameTime = std::chrono::system_clock::now();
         static auto currentFrameTime = std::chrono::system_clock::now();
@@ -36,14 +36,26 @@ namespace aries::render {
         renderer->Clear();
 
         //shapeListMutex.lock_shared();
-        
-        //* 把形状按着色器类型分组
-        std::unordered_map<ShaderType, vector<sptr<Shape>>> shapeGroups;
+        vector<sptr<Shape>> activeShapes;
+
         for (auto& wk : shapeList) {
             if (auto shape = wk.lock()) {
-                if (shape->material) {
-                    shapeGroups[shape->material->GetShaderType()].emplace_back(std::move(shape));
-                }
+                activeShapes.emplace_back(std::move(shape));
+            }
+        }
+
+        //* 渲染阴影贴图
+        if (enableShadow) {
+            if (scene->directionalShadow) {
+                scene->directionalShadow->UpdateShadowMap(activeShapes);
+            }
+        }
+
+        //* 把形状按着色器类型分组
+        std::unordered_map<ShaderType, vector<sptr<Shape>>> shapeGroups;
+        for (auto& shape : activeShapes) {
+            if (shape->material) {
+                shapeGroups[shape->material->GetShaderType()].emplace_back(std::move(shape));
             }
         }
 

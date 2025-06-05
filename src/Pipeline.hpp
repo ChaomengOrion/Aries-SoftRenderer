@@ -11,8 +11,6 @@
 #include "Render/Renderer.hpp"
 #include "Render/Shape.hpp"
 
-#include <shared_mutex>
-
 using namespace aries::scene;
 
 namespace aries::render {
@@ -24,6 +22,7 @@ namespace aries::render {
 
         //std::shared_mutex shapeListMutex; // 保护shapeList的互斥锁，避免渲染线程和主线程冲突
         bool showCoordinateSystem = true; // 是否显示坐标系
+        bool enableShadow = true; // 是否启用阴影
 
         uint64_t triangleCount = 0; // 三角形计数
         float frameTime = 0.0f; // 帧时间

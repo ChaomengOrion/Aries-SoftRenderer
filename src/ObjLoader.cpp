@@ -4,6 +4,9 @@
 #include <iostream>
 #include <filesystem>
 #include "Render/TextureManager.hpp"
+#include "Render/Materials/M_BlinnPhongMaterial.hpp"
+#include "Render/Materials/M_PreviewMaterial.hpp"
+#include "Render/Materials/M_ShadowedBlinnPhongMaterial.hpp"
 
 using namespace tinyobj;
 using namespace aries::material;
@@ -54,10 +57,10 @@ sptr<Model> ObjLoader::LoadModel(const string& filename) {
             }
 
             if (texture) {
-                materialPtrs.push_back(std::make_shared<BlinnPhongMaterial>(mat.name, texture)); // 创建材质球并存储
+                materialPtrs.push_back(std::make_shared<ShadowedBlinnPhongMaterial>(mat.name, texture)); // 创建材质球并存储
                 std::cout << "[ObjLoader] 材质 “" << mat.name << "” 的纹理加载成功: " << texPath << std::endl;
             } else {
-                materialPtrs.push_back(std::make_shared<BlinnPhongMaterial>(mat.name, nullptr)); // 如果加载失败，使用空纹理
+                materialPtrs.push_back(std::make_shared<ShadowedBlinnPhongMaterial>(mat.name, nullptr)); // 如果加载失败，使用空纹理
             }
         }
     }
@@ -76,7 +79,7 @@ sptr<Model> ObjLoader::LoadModel(const string& filename) {
                 out->material = materialPtrs[matId]; // 设置材质球
             } else {
                 std::cerr << "[ObjLoader] 无效的材质ID: " << matId << "，使用默认材质球" << std::endl;
-                out->material = std::make_shared<PreviewMaterial>("DefaultPreviewMaterial"); //* 使用默认材质
+                out->material = std::make_shared<ShadowedBlinnPhongMaterial>("DefaultPreviewMaterial", nullptr); //* 使用默认材质
             }
         } else {
             throw std::runtime_error("Shape " + shape.name + " has no material assigned.");

@@ -5,8 +5,9 @@
 #pragma once
 
 #include "Shader.hpp"
-#include "S_BlinnPhongShader.hpp"
 #include "S_PreviewShader.hpp"
+#include "S_BlinnPhongShader.hpp"
+#include "S_ShadowedBlinnPhongShader.hpp"
 
 namespace aries::shader {
     // 类型列表 - 用于存储所有着色器类型
@@ -14,6 +15,7 @@ namespace aries::shader {
 
     // 着色器类型注册表
     using RegisteredShaders = TypeList<
+        ShadowedBlinnPhongShader,
         BlinnPhongShader,
         PreviewShader
     >;

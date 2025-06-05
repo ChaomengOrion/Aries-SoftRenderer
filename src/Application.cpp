@@ -8,6 +8,7 @@
 #include "ObjLoader.hpp"
 
 #include "ImGuiFileDialog.h"
+#include "Render/Materials/M_ShadowedBlinnPhongMaterial.hpp"
 
 namespace aries {
     void Application::Init() {
@@ -89,6 +90,11 @@ namespace aries {
             ImGui::Text("counter = %d", counter);
 
             ImGui::Checkbox("显示坐标系", &pipeline->showCoordinateSystem);
+
+            if (scene->directionalShadow && ImGui::Button("[DEBUG] 保存深度图")) {
+                scene->directionalShadow->SaveShadowMap("shadow_map.png");
+                std::cout << "[DEBUG] 深度图已保存为 shadow_map.png" << std::endl;
+            }
 
             ImGui::Text("三角形数量: %lld", pipeline->triangleCount);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / config.io.Framerate, config.io.Framerate);
@@ -202,8 +208,8 @@ namespace aries {
             ImGui::SliderFloat("Pitch (°)",   &camera->eluaAngle.y(), -89.0f,   89.0f);
             ImGui::SliderFloat("Roll  (°)",   &camera->eluaAngle.z(),  -180.0f, 180.0f);
             ImGui::SliderFloat("FOV (°)", &camera->Fov, 1.0f, 180.0f);
-            ImGui::InputFloat("近平面裁剪", &camera->Near);
-            ImGui::InputFloat("远平面裁剪", &camera->Far);
+            ImGui::InputFloat("近平面裁剪", &camera->Near, 0.0001f, 0.001f, "%.6f");
+            ImGui::InputFloat("远平面裁剪", &camera->Far, 0.01f, 1.f, "%.6f");
 
             // 光源调整
             auto light = scene->mainLight;
@@ -223,6 +229,7 @@ namespace aries {
                 lightFront.y() = sinf(lightPitchRad);
                 lightFront.z() = cosf(lightPitchRad) * sinf(lightYawRad);
                 light->direction = lightFront.normalized();
+                scene->directionalShadow->SetLightDirection(light->direction);
             } else {
                 ImGui::Text("没有光源");
             }
@@ -249,20 +256,41 @@ namespace aries {
                 ImGui::SliderFloat("Specular Intensity", &specularIntensity, 0.0f, 1.0f);
                 ImGui::ColorEdit3("Specular Color", specularColor); // 镜面反射颜色
 
+                // 材质阴影设置
+                static float shadowBias = 0.002f; // 阴影偏移
+                static float shadowIntensity = 0.8f; // 阴影强度
+                static int pcfSamples = 3; // PCF采样数量
+                static float shadowDistanceAttenuation = 15.0f; // 阴影距离衰减系数
+                static float shadowMinIntensity = 0.01f; // 最小阴影强度
+    
+                ImGui::InputFloat("Shadow Bias", &shadowBias, 0.0001f, 0.001f, "%.6f");
+                ImGui::SliderFloat("Shadow Intensity", &shadowIntensity, 0.0f, 1.0f);
+                ImGui::SliderInt("PCF Samples", &pcfSamples, 1, 5); // PCF采样数量
+                ImGui::SliderFloat("Shadow Distance Attenuation", &shadowDistanceAttenuation, 0.0f, 100.0f);
+                ImGui::SliderFloat("Shadow Min Intensity", &shadowMinIntensity, 0.0f, 1.0f);
+
+                ImGui::Separator();
+
                 for (const auto& [name, model] : scene->models) {
                     ImGui::Text("Model: %s", name.c_str());
                     
                     // 更新模型的材质
                     for (auto& shape : model->shapes) {
                         if (autoApplyMaterial || (ImGui::Text("name: %s", shape->name.c_str()), ImGui::Button(("Update Material##" + shape->name).c_str()))) {
-                            /*auto mat = std::static_pointer_cast<BlinnPhongMaterial>(shape->material);
+                            auto mat = std::static_pointer_cast<ShadowedBlinnPhongMaterial>(shape->material);
                             mat->property.shininess = shininess;
                             mat->property.ambientIntensity = ambientIntensity;
                             mat->property.diffuseIntensity = diffuseIntensity;
                             mat->property.specularIntensity = specularIntensity;
                             mat->property.ambient = Vector3f(ambientColor[0], ambientColor[1], ambientColor[2]);
                             mat->property.diffuse = Vector3f(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
-                            mat->property.specular = Vector3f(specularColor[0], specularColor[1], specularColor[2]);*/
+                            mat->property.specular = Vector3f(specularColor[0], specularColor[1], specularColor[2]);
+
+                            mat->property.shadowBias = shadowBias;
+                            mat->property.shadowIntensity = shadowIntensity;
+                            mat->property.pcfSamples = pcfSamples;
+                            mat->property.shadowDistanceAttenuation = shadowDistanceAttenuation;
+                            mat->property.shadowMinIntensity = shadowMinIntensity;
                         }
                     }
                 }

@@ -21,9 +21,10 @@ namespace aries::render {
 
     template<ShaderConcept ShaderT>
     struct PipelineFragmentData {
-        ShaderT::FragmentPaylod_t fragmentPayload; // 片元着色器输入数据
         ShaderT::v2f_t fragmentData[3];
         float clipW[3];  // 保存透视除法前的 w 值
+        Matrixs matrixs; // 矩阵数据
+        ShaderT::property_t* property; // 着色器属性
     };
 
     class Renderer {
@@ -52,8 +53,6 @@ namespace aries::render {
             return x + (_height - y - 1) * _width;
         }
 
-        static Matrix4f GetModelMatrix(const Model& o);
-
         Matrix4f GetViewMatrix();
 
         Matrix4f GetClipMatrix();
@@ -72,20 +71,25 @@ namespace aries::render {
             vector<PipelineFragmentData<ShaderT>> prims;
             prims.reserve(lastTriangleCount * 1.2f); // 预分配空间，避免频繁扩容，实测能加速顶点着色速度很多
 
-            Matrix4f mat_model_to_view = GetViewMatrix();
+            Matrix4f mat_world_to_view = GetViewMatrix();
             Matrix4f mat_view_to_clip = GetClipMatrix();
 
+            ShaderBase<ShaderT>::BeforeShader({
+                .scene = m_scene.get(),
+                .camera = m_camera.get(),
+            });
+
             for (auto shape : shapeList) {
-                Matrix4f mat_view = mat_model_to_view * GetModelMatrix(*shape->model);
+                Matrix4f mat_model_to_world = shape->model->GetModelMatrix();
+                Matrix4f mat_model_to_view = mat_world_to_view * mat_model_to_world;
+                Matrix4f mat_model_to_clip = mat_view_to_clip * mat_model_to_view;
 
-                auto shaderPropertyPtr = &static_cast<MaterialBase<ShaderT>*>(shape->material.get())->property;
+                auto* property = &static_cast<MaterialBase<ShaderT>*>(shape->material.get())->property;
 
-                // 构造顶点着色器 Payload
-                VertexPaylod<ShaderT> vp {
-                    .camera = m_camera.get(),
-                    .mat_view = mat_view,
-                    .mat_mvp = mat_view_to_clip * mat_view, 
-                    .property = shaderPropertyPtr
+                Matrixs matrixs = {
+                    .mat_model = mat_model_to_world,
+                    .mat_view = mat_model_to_view,
+                    .mat_mvp = mat_model_to_clip,
                 };
 
                 // 每个三角形
@@ -101,22 +105,19 @@ namespace aries::render {
 
                     // 装配到 TriangleData
                     PipelineFragmentData<ShaderT> pd;
-                    pd.fragmentPayload = {
-                        .scene = m_scene.get(),
-                        .camera = m_camera.get(),
-                        .mat_view = mat_view,
-                        .property = shaderPropertyPtr
-                    };
+
+                    pd.matrixs = matrixs;
+                    pd.property = property;
 
                     //* 调用 Shader::VertexShader 得到 v2f
-                    pd.fragmentData[0] = ShaderBase<ShaderT>::VertexShader(vp, in[0]);
-                    pd.fragmentData[1] = ShaderBase<ShaderT>::VertexShader(vp, in[1]);
-                    pd.fragmentData[2] = ShaderBase<ShaderT>::VertexShader(vp, in[2]);
+                    pd.fragmentData[0] = ShaderBase<ShaderT>::VertexShader(in[0], matrixs, *property);
+                    pd.fragmentData[1] = ShaderBase<ShaderT>::VertexShader(in[1], matrixs, *property);
+                    pd.fragmentData[2] = ShaderBase<ShaderT>::VertexShader(in[2], matrixs, *property);
                     // 此时已经在NDC坐标系下，但是未经透视除法处理，先做裁剪再做透视除法
 
                     //* 近远平面裁剪
                     //? 为什么要先做裁剪，再做透视除法?
-                    //? 1.第一个原因，避免裁剪出来的新三角形有畸变
+                    //? 1. 第一个原因，避免裁剪出来的新三角形有畸变
                     //? 2. 进行透视除法之前会进行裁剪，会把z=0的部分剔除掉，从而保证透视除法的时候不会存在z=0的顶点。
 
                     bool allBehindNear = true, allBeyondFar = true, hasBehindNear = false, hasBeyondFar = false;
@@ -186,7 +187,9 @@ namespace aries::render {
                         //* 使用扇形三角剖分将裁剪后的多边形分解成三角形
                         for (int k = 1; k < vertexCount - 1; ++k) {
                             PipelineFragmentData<ShaderT> clippedPd;
-                            clippedPd.fragmentPayload = pd.fragmentPayload;
+
+                            clippedPd.matrixs = pd.matrixs; // 继承原始矩阵数据
+                            clippedPd.property = pd.property; // 继承原始属性
                             
                             //* 设置三角形的三个顶点
                             clippedPd.fragmentData[0] = clippedVertices[0];
@@ -322,9 +325,13 @@ namespace aries::render {
         // 片元着色器(使用特定着色器类型)
         template<ShaderConcept ShaderT>
         void FragmentShaderWith(vector<PipelineFragmentData<ShaderT>>&& frags) {
+        
+            //! temp
+            //!uint64_t _pixelCount = 0; // 计算着色的像素数量
+
 #pragma omp parallel for schedule(static)
             for (size_t i = 0; i < frags.size(); ++i) {
-                auto&& [paylod, frag, clipW] = frags[i];
+                auto&& [frag, clipW, mats, property] = frags[i];
                 float minXf = _width, maxXf = 0, minYf = _height, maxYf = 0;
                 for (int j = 0; j < 3; ++j) {
                     Vector4f v = frag[j].screenPos;
@@ -369,6 +376,9 @@ namespace aries::render {
                                 continue; // 深度测试失败，跳过该像素
                             }
                             
+                            //!#pragma omp atomic
+                            //!++_pixelCount; // 统计着色的像素数量
+                            
                             //* 进行插值
                             {
                                 v2f.screenPos = Vector4f(
@@ -410,9 +420,8 @@ namespace aries::render {
                             }
 
                             //* 使用shader处理着色
-                            Vector3f pixelColor = ShaderBase<ShaderT>::FragmentShader(paylod, v2f);
+                            Vector3f pixelColor = ShaderBase<ShaderT>::FragmentShader(v2f, mats, *property);
 
-                            
                             if (_zBuffer[idx] == theZ) [[likely]] { // 校验，防止多线程着色错误
                                 SetPixelColor(x, y, pixelColor);
                             }
@@ -420,6 +429,9 @@ namespace aries::render {
                     }
                 }
             }
+
+            //! 输出着色的像素数量
+            //! std::cout << _pixelCount << '\n';
         }
 
     private:

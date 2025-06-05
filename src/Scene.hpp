@@ -4,8 +4,10 @@
 #include "Render/Model.hpp"
 #include "Render/Light.hpp"
 #include "SharedConfig.hpp"
+#include "Render/Shadow/DirectionalShadow.hpp"
 
 using namespace aries::model;
+using namespace aries::shadow;
 
 namespace aries::render {
     class Pipeline; // 前向声明
@@ -40,6 +42,7 @@ namespace aries::scene {
     #pragma endregion
 
         sptr<Light> mainLight; // 场景主光源
+        std::unique_ptr<DirectionalShadow> directionalShadow; // 平行光阴影映射
         std::unordered_map<string, sptr<Model>> models; // 场景中的模型列表
         sptr<Camera> camera; // 场景的相机
         sptr<render::Pipeline> pipeline; // 渲染管线

@@ -69,6 +69,9 @@ namespace aries::scene {
         mainLight->color = Vector3f(1, 1, 1); // 白色光
         mainLight->intensity = 1.0f; // 光强度
         mainLight->direction = Vector3f(0, -1, -1).normalized(); // 光源方向
+        
+        std::cout << "[Scene] 新建平行光" << std::endl;
+        directionalShadow = std::make_unique<DirectionalShadow>(Vector3f(0, -1, -1).normalized(), 2048); // 创建一个1024x1024的阴影映射
     }
     #pragma endregion
 }

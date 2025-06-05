@@ -1,12 +1,7 @@
 #include "Renderer.hpp"
 #include "Shaders/ShaderRegister.hpp"
-#include <numbers>
 
 namespace aries::render {
-    inline constexpr float ToRadian(float angle) {
-        return (angle / 180) * std::numbers::pi_v<float>;
-    }
-
     Renderer::Renderer(sptr<Raster> raster, int w, int h)
         : _width(w) , _height(h) {
         if (w <= 0 || h <= 0) {
@@ -30,44 +25,6 @@ namespace aries::render {
     void Renderer::SetCameraAndScene(sptr<Camera> camera, sptr<Scene> scene) {
         m_camera = std::move(camera);
         m_scene = std::move(scene);
-    }
-
-    Matrix4f Renderer::GetModelMatrix(const Model& o) {
-        Matrix4f rX, rY, rZ;
-        float radX, radY, radZ;
-        Matrix4f scale;
-        Matrix4f move;
-
-        radX = ToRadian(o.rotation.x());
-        radY = ToRadian(o.rotation.y());
-        radZ = ToRadian(o.rotation.z());
-
-        rX <<   1, 0, 0, 0, 
-                0, cos(radX), -sin(radX), 0, 
-                0, sin(radX), cos(radX), 0, 
-                0, 0, 0, 1;
-
-        rY <<   cos(radY), 0, sin(radY), 0, 
-                0, 1, 0, 0, 
-                -sin(radY), 0, cos(radY), 0, 
-                0, 0, 0, 1;
-
-        rZ <<   cos(radZ), -sin(radZ), 0, 0, 
-                sin(radZ), cos(radZ), 0, 0, 
-                0, 0, 1, 0, 
-                0, 0, 0, 1;
-
-        scale <<    o.scale.x(), 0, 0, 0, 
-                    0, o.scale.y(), 0, 0, 
-                    0, 0, o.scale.z(), 0, 
-                    0, 0, 0, 1;
-
-        move << 1, 0, 0, o.position.x(), 
-                0, 1, 0, o.position.y(), 
-                0, 0, 1, o.position.z(), 
-                0, 0, 0, 1;
-
-        return move * rZ * rX * rY * scale;
     }
 
     Matrix4f Renderer::GetViewMatrix() {
