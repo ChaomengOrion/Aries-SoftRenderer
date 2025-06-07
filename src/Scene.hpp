@@ -27,6 +27,10 @@ namespace aries::scene {
         // 获取场景中的模型
         sptr<Model> GetModel(const std::string& name);
 
+        void RemoveModel(const std::string& name);
+
+        void CopyModel(const std::string& name, const std::string& newName);
+
         // 设置相机
         void SetCamera(sptr<Camera> cam);
 

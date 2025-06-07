@@ -31,13 +31,13 @@ namespace aries::shader {
         float shininess = 64.f; // 高光指数，用于控制高光的锐利程度
         
         // 阴影相关参数
-        float shadowBias = 0.001f;    // 阴影偏移，避免阴影痤疮
+        float shadowBias = 0.002f;    // 阴影偏移，避免阴影痤疮
         float shadowIntensity = 0.8f; // 阴影强度（0-1）
         int pcfSamples = 3;           // PCF 采样数量（1=硬阴影，3/5=软阴影）
 
         // 距离衰减参数
-        float shadowDistanceAttenuation = 20.0f;  // 距离衰减系数，值越大衰减越快
-        float shadowMinIntensity = 0.1f;          // 最小阴影强度
+        float shadowDistanceAttenuation = 15.0f;  // 距离衰减系数，值越大衰减越快
+        float shadowMinIntensity = 0.01f;          // 最小阴影强度
     };
 
     class ShadowedBlinnPhongShader : public ShaderBase<ShadowedBlinnPhongShader> {

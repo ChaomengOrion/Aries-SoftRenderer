@@ -19,6 +19,9 @@ public:
     // 返回 Vector3f(r,g,b)，范围 [0,1]
     Vector3f Sample(float u, float v) const;
 
+    inline int GetWidth() const { return width; }
+    
+    inline int GetHeight() const { return height; }
 private:
     int width = 0, height = 0, channels = 0;
     std::vector<uint8_t> data;  // 原始像素数据（行主序）

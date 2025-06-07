@@ -259,10 +259,10 @@ namespace aries::shadow {
                 }
             }
 
-            // 更新粗略深度缓冲
-            if (depthUpdated) {
-                UpdateCoarseDepthBuffer(minX, maxX, minY, maxY, minDepthUpdated);
-            }
+            //! 更新粗略深度缓冲
+            // if (depthUpdated) {
+            //     UpdateCoarseDepthBuffer(minX, maxX, minY, maxY, minDepthUpdated);
+            // }
         }
 
         // 更新粗略深度缓冲

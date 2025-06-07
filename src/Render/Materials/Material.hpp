@@ -18,6 +18,7 @@ namespace aries::material {
 
     public:
         using shader_t = ShaderT; // 着色器类型
+        using property_t = typename shader_t::property_t; // 着色器属性类型
 
         string name; // 材质名称
 

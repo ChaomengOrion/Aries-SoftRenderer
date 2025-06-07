@@ -38,6 +38,42 @@ namespace aries::scene {
         return models.at(name);
     }
 
+    void Scene::RemoveModel(const std::string& name) {
+        auto it = models.find(name);
+        if (it != models.end()) {
+            std::cout << "[Scene] 移除模型：" << name << std::endl;
+            models.erase(it);
+            pipeline->CleanUpUnusedShapes(); // 清理管线中未使用的形状
+        } else {
+            std::cerr << "[Scene] 模型 " << name << " 不存在，无法移除。" << std::endl;
+        }
+    }
+
+    void Scene::CopyModel(const std::string& name, const std::string& newName) {
+        auto it = models.find(name);
+        if (it != models.end()) {
+            auto model = it->second;
+            auto newModel = std::make_shared<Model>(newName);
+            // 深克隆形状
+            for (const auto& shape : model->shapes) {
+                auto newShape = std::make_shared<Shape>(); // 深拷贝形状
+                newShape->name = shape->name + "_copy"; // 修改新形状的名称
+                newShape->mesh = shape->mesh; // 直接引用原始网格数据
+                // TODO: 深拷贝材质
+                newShape->material = shape->material; // 直接引用原始材质
+                newShape->model = newModel.get(); // 设置新模型的引用
+                newModel->shapes.push_back(newShape);
+            }
+            newModel->position = model->position + Vector3f(1.f, 0.f, 0.f); // 避免与原模型重叠
+            newModel->rotation = model->rotation; // 复制旋转
+            newModel->scale = model->scale; // 复制缩放
+            AddModel(newModel); // 添加到场景
+            std::cout << "[Scene] 复制模型：" << name << " 为 " << newName << std::endl;
+        } else {
+            std::cerr << "[Scene] 模型 " << name << " 不存在，无法复制。" << std::endl;
+        }
+    }
+
     // 设置相机
     void Scene::SetCamera(sptr<Camera> cam) {
         camera = cam;

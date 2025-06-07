@@ -8,7 +8,6 @@
 #include "ObjLoader.hpp"
 
 #include "ImGuiFileDialog.h"
-#include "Render/Materials/M_ShadowedBlinnPhongMaterial.hpp"
 
 namespace aries {
     void Application::Init() {
@@ -62,29 +61,25 @@ namespace aries {
     void Application::OnUpdate(SharedConfig& config) {
         const float deltaTime = 1.0f / config.io.Framerate;
 
-        static bool show_loader_window, show_config_window;
+        static bool show_loader_window, show_config_window, show_scene_window;
         {
             static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Aries - Chaomeng's soft renderer"); // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin("Aries - Chaomeng's soft renderer");
 
-            ImGui::Text("This is some useful text."); // Display some text (you can use a format
-                                                    // strings too)
-            ImGui::Checkbox("Config Window",
-                            &show_config_window); // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_loader_window);
+            ImGui::Text("This is some useful text.");
+            ImGui::Checkbox("Config Window", &show_config_window);
+            ImGui::Checkbox("Scene Manager", &show_scene_window); // 新增场景管理窗口
+            ImGui::Checkbox("Model Loader", &show_loader_window);
 
             ImGui::Text("windows width: %d, height: %d", config.width, config.height);
             ImGui::Text("framebuffer width: %d, height: %d", config.framebuffer_width, config.framebuffer_height);
 
-            ImGui::SliderFloat(
-                "float", &f, 0.0f, 1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color",
-                            (float*)&config.clear_color); // Edit 3 floats representing a color
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&config.clear_color);
 
-            if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return
-                                        // true when edited/activated)
+            if (ImGui::Button("Button"))
                 counter++;
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
@@ -99,93 +94,24 @@ namespace aries {
             ImGui::Text("三角形数量: %lld", pipeline->triangleCount);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / config.io.Framerate, config.io.Framerate);
             ImGui::Text("Pipeline current render FPS %.3f ms/frame (%.1f FPS)", 1000.f * pipeline->frameTime, 1.f / pipeline->frameTime);
-            /*ImGui::Checkbox("启用渲染线程", &renderThreadRunning);
-            if (renderThreadRunning && !renderThread.joinable()) {
-                StartRenderThread(); // 确保渲染线程在运行
-            } else if (!renderThreadRunning && renderThread.joinable()) {
-                renderThread.join(); // 等待渲染线程结束
-            }*/
+
             ImGui::End();
         }
 
-        //* 显示模型加载器窗口
+        // 场景管理器窗口
+        if (show_scene_window) {
+            ShowSceneManagerWindow(&show_scene_window);
+        }
+
+        // 模型加载器窗口
         if (show_loader_window) {
-            ImGui::Begin("模型加载器", &show_loader_window, ImGuiWindowFlags_AlwaysAutoResize);
-
-            ImGui::Text("加载 3D 模型文件");
-            ImGui::Separator();
-            
-            // 文件路径输入框
-            static char filePath[512] = R"(F:\绝区零安比\无标题.obj)";
-            ImGui::InputTextWithHint("##filepath", "请输入文件路径或点击浏览选择...", filePath, sizeof(filePath));
-
-            ImGui::SameLine();
-            if (ImGui::Button("浏览文件...")) {
-                // 使用新版本的 FileDialogConfig
-                IGFD::FileDialogConfig config;
-                config.path = "F:\\";  // 设置默认路径
-                config.countSelectionMax = 1;
-                config.flags = ImGuiFileDialogFlags_Modal;
-                
-                // 调用新版本的 OpenDialog
-                ImGuiFileDialog::Instance()->OpenDialog(
-                    "ChooseModelFile",           // key
-                    "选择 3D 模型文件",          // title  
-                    ".obj,.fbx,.dae,.ply,.stl",  // filters
-                    config                       // config
-                );
-            }
-            
-            // 显示文件对话框
-            if (ImGuiFileDialog::Instance()->Display("ChooseModelFile", 
-                ImGuiWindowFlags_None, 
-                ImVec2(800, 600) // 最小尺寸
-                )) {
-                
-                if (ImGuiFileDialog::Instance()->IsOk()) {
-                    std::string selectedFile = ImGuiFileDialog::Instance()->GetFilePathName();
-                    strncpy_s(filePath, selectedFile.c_str(), sizeof(filePath) - 1);
-                    filePath[sizeof(filePath) - 1] = '\0';
-                }
-                ImGuiFileDialog::Instance()->Close();
-            }
-            
-            ImGui::Separator();
-            
-            if (ImGui::Button("加载模型")) {
-                if (strlen(filePath) > 0) {
-                    LoadModel(filePath);
-                }
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("清除所有模型")) {
-                scene->ClearObjects();
-            }
-            
-            ImGui::Separator();
-            
-            // 显示已加载的模型信息
-            if (!scene->models.empty()) {
-                ImGui::Text("已加载的模型:");
-                for (const auto& [name, model] : scene->models) {
-                    ImGui::BulletText("%s (%zu shapes)", name.c_str(), model->shapes.size());
-                }
-            } else {
-                ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "暂无已加载的模型");
-            }
-
-            if (ImGui::Button("关闭窗口")) 
-                show_loader_window = false;
-            
-            ImGui::End();
+            ShowModelLoaderWindow(&show_loader_window);
         }
 
+        // 相机控制
         auto camera = scene->GetCamera();
-        
-        // 检测键盘输入，移动相机
         if (!config.io.WantCaptureKeyboard) {
-            const float cameraSpeed = 2.0f * deltaTime; // 每秒移动2个单位
+            const float cameraSpeed = 2.0f * deltaTime;
             if (glfwGetKey(config.window, GLFW_KEY_W) == GLFW_PRESS)
                 camera->Position += Vector4f(camera->Up.x(), camera->Up.y(), camera->Up.z(), 0.f) * cameraSpeed;
             if (glfwGetKey(config.window, GLFW_KEY_S) == GLFW_PRESS)
@@ -197,107 +123,9 @@ namespace aries {
                 camera->Position += Vector4f(right.x(), right.y(), right.z(), 0.f) * cameraSpeed;
         }
 
-        // 3. Show another simple window.
+        // 配置窗口
         if (show_config_window) {
-            ImGui::Begin("Config Window", &show_config_window);
-
-            const float PI = std::numbers::pi_v<float>;
-
-            ImGui::DragFloat3("Camera Position", camera->Position.data(), 0.1f);
-            ImGui::SliderFloat("Yaw   (°)",   &camera->eluaAngle.x(),   -180.0f, 180.0f);
-            ImGui::SliderFloat("Pitch (°)",   &camera->eluaAngle.y(), -89.0f,   89.0f);
-            ImGui::SliderFloat("Roll  (°)",   &camera->eluaAngle.z(),  -180.0f, 180.0f);
-            ImGui::SliderFloat("FOV (°)", &camera->Fov, 1.0f, 180.0f);
-            ImGui::InputFloat("近平面裁剪", &camera->Near, 0.0001f, 0.001f, "%.6f");
-            ImGui::InputFloat("远平面裁剪", &camera->Far, 0.01f, 1.f, "%.6f");
-
-            // 光源调整
-            auto light = scene->mainLight;
-            if (light) {
-                ImGui::Text("光源朝向（欧拉角）");
-                static float lightYaw   = -90.0f; // 水平角度，度
-                static float lightPitch =  0.0f; // 垂直角度，度
-                static float lightRoll  = -180.f; // 翻滚角度，度
-                ImGui::SliderFloat("Light Yaw   (°)",   &lightYaw,   -180.0f, 180.0f);
-                ImGui::SliderFloat("Light Pitch (°)",   &lightPitch, -89.0f,   89.0f);
-                ImGui::SliderFloat("Light Roll  (°)",   &lightRoll,  -180.0f, 180.0f);
-                // 更新光源方向
-                float lightYawRad   = lightYaw   * PI / 180.0f;
-                float lightPitchRad = lightPitch * PI / 180.0f;
-                Vector3f lightFront;
-                lightFront.x() = cosf(lightPitchRad) * cosf(lightYawRad);
-                lightFront.y() = sinf(lightPitchRad);
-                lightFront.z() = cosf(lightPitchRad) * sinf(lightYawRad);
-                light->direction = lightFront.normalized();
-                scene->directionalShadow->SetLightDirection(light->direction);
-            } else {
-                ImGui::Text("没有光源");
-            }
-
-            if (scene->models.empty()) {
-                ImGui::Text("当前场景没有模型");
-            } else {
-                static float shininess = 64.f; // 默认高光系数
-                static float ambientIntensity = 0.43f; // 默认环境光强度
-                static float ambientColor[3] = {1.0f, 1.0f, 1.0f}; // 默认环境光颜色
-                static float diffuseIntensity = 0.47f; // 默认漫反射强度
-                static float diffuseColor[3] = {1.0f, 1.0f, 1.0f}; // 默认漫反射颜色
-                static float specularIntensity = 0.1; // 默认镜面反射强度
-                static float specularColor[3] = {1.0f, 1.0f, 1.0f}; // 默认镜面反射颜色
-
-                static bool autoApplyMaterial = true; // 自动应用材质
-                ImGui::Checkbox("Auto Apply Material", &autoApplyMaterial);
-                
-                ImGui::SliderFloat("Shininess", &shininess, 0.0f, 128.0f);
-                ImGui::SliderFloat("Ambient Intensity", &ambientIntensity, 0.0f, 1.0f);
-                ImGui::ColorEdit3("Ambient Color", ambientColor); // 环境光颜色
-                ImGui::SliderFloat("Diffuse Intensity", &diffuseIntensity, 0.0f, 1.0f);
-                ImGui::ColorEdit3("Diffuse Color", diffuseColor); // 漫反射颜色
-                ImGui::SliderFloat("Specular Intensity", &specularIntensity, 0.0f, 1.0f);
-                ImGui::ColorEdit3("Specular Color", specularColor); // 镜面反射颜色
-
-                // 材质阴影设置
-                static float shadowBias = 0.002f; // 阴影偏移
-                static float shadowIntensity = 0.8f; // 阴影强度
-                static int pcfSamples = 3; // PCF采样数量
-                static float shadowDistanceAttenuation = 15.0f; // 阴影距离衰减系数
-                static float shadowMinIntensity = 0.01f; // 最小阴影强度
-    
-                ImGui::InputFloat("Shadow Bias", &shadowBias, 0.0001f, 0.001f, "%.6f");
-                ImGui::SliderFloat("Shadow Intensity", &shadowIntensity, 0.0f, 1.0f);
-                ImGui::SliderInt("PCF Samples", &pcfSamples, 1, 5); // PCF采样数量
-                ImGui::SliderFloat("Shadow Distance Attenuation", &shadowDistanceAttenuation, 0.0f, 100.0f);
-                ImGui::SliderFloat("Shadow Min Intensity", &shadowMinIntensity, 0.0f, 1.0f);
-
-                ImGui::Separator();
-
-                for (const auto& [name, model] : scene->models) {
-                    ImGui::Text("Model: %s", name.c_str());
-                    
-                    // 更新模型的材质
-                    for (auto& shape : model->shapes) {
-                        if (autoApplyMaterial || (ImGui::Text("name: %s", shape->name.c_str()), ImGui::Button(("Update Material##" + shape->name).c_str()))) {
-                            auto mat = std::static_pointer_cast<ShadowedBlinnPhongMaterial>(shape->material);
-                            mat->property.shininess = shininess;
-                            mat->property.ambientIntensity = ambientIntensity;
-                            mat->property.diffuseIntensity = diffuseIntensity;
-                            mat->property.specularIntensity = specularIntensity;
-                            mat->property.ambient = Vector3f(ambientColor[0], ambientColor[1], ambientColor[2]);
-                            mat->property.diffuse = Vector3f(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
-                            mat->property.specular = Vector3f(specularColor[0], specularColor[1], specularColor[2]);
-
-                            mat->property.shadowBias = shadowBias;
-                            mat->property.shadowIntensity = shadowIntensity;
-                            mat->property.pcfSamples = pcfSamples;
-                            mat->property.shadowDistanceAttenuation = shadowDistanceAttenuation;
-                            mat->property.shadowMinIntensity = shadowMinIntensity;
-                        }
-                    }
-                }
-            }
-
-            if (ImGui::Button("Close Me")) show_config_window = false;
-            ImGui::End();
+            ShowConfigWindow(&show_config_window, camera);
         }
 
         pipeline->Render(scene, scene->GetCamera());
@@ -396,5 +224,477 @@ namespace aries {
         auto camera = scene->GetCamera();
         const float scrollSpeed = 0.5f; // 滚轮灵敏度
         camera->Position += Vector4f(camera->Direction.x(), camera->Direction.y(), camera->Direction.z(), 0.f) * yoffset * scrollSpeed;
+    }
+
+    // 场景管理器窗口
+    void Application::ShowSceneManagerWindow(bool* p_open) {
+        ImGui::Begin("Scene Manager", p_open, ImGuiWindowFlags_AlwaysAutoResize);
+
+        if (scene->models.empty()) {
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "场景中暂无模型");
+            ImGui::Text("请使用 Model Loader 加载模型");
+            ImGui::End();
+            return;
+        }
+
+        ImGui::Text("场景中的模型:");
+        ImGui::Separator();
+
+        static std::string selectedModel = "";
+        static std::string selectedShape = "";
+        static std::string modelToDelete = ""; // 用于标记要删除的模型
+
+        // 遍历所有模型
+        for (auto& [modelName, model] : scene->models) {
+            // 模型节点（可折叠）
+            bool modelNodeOpen = ImGui::TreeNode(("Model: " + modelName).c_str());
+            
+            // 右键菜单
+            if (ImGui::BeginPopupContextItem()) {
+                if (ImGui::MenuItem("删除模型", nullptr, false, true)) {
+                    modelToDelete = modelName; // 标记要删除的模型
+                }
+                if (ImGui::MenuItem("重置变换")) {
+                    // 重置模型变换到默认状态
+                    model->position = Vector3f(0.0f, 0.0f, 0.0f);
+                    model->rotation = Vector3f(0.0f, 0.0f, 0.0f);
+                    model->scale = Vector3f(1.0f, 1.0f, 1.0f);
+                }
+                if (ImGui::MenuItem("复制模型")) {
+                    // 复制模型
+                    std::string newName = modelName + "_copy";
+                    int copyIndex = 1;
+                    while (scene->models.find(newName) != scene->models.end()) {
+                        newName = modelName + "_copy_" + std::to_string(copyIndex++);
+                    }
+                    scene->CopyModel(modelName, newName);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (modelNodeOpen) {
+                ImGui::PushID(modelName.c_str());
+
+                // 模型信息显示
+                ImGui::Text("Shapes: %zu", model->shapes.size());
+                ImGui::Text("Total Triangles: %zu", [&model]() {
+                    size_t totalTriangles = 0;
+                    for (const auto& shape : model->shapes) {
+                        totalTriangles += shape->mesh.size();
+                    }
+                    return totalTriangles;
+                }());
+
+                ImGui::Separator();
+
+                // 模型变换控制
+                if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::DragFloat3("Position", model->position.data(), 0.01f);
+                    ImGui::DragFloat3("Rotation", model->rotation.data(), 0.2f, -180.0f, 180.0f);
+                    ImGui::DragFloat3("Scale", model->scale.data(), 0.01f, 0.1f, 10.0f);
+
+                    // 快速操作按钮
+                    if (ImGui::Button("Reset Position")) {
+                        model->position = Vector3f(0.0f, 0.0f, 0.0f);
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Reset Rotation")) {
+                        model->rotation = Vector3f(0.0f, 0.0f, 0.0f);
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Reset Scale")) {
+                        model->scale = Vector3f(1.0f, 1.0f, 1.0f);
+                    }
+                }
+
+                ImGui::Separator();
+
+                // 显示模型的 Shapes
+                if (ImGui::CollapsingHeader("Shapes", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    for (size_t i = 0; i < model->shapes.size(); ++i) {
+                        auto& shape = model->shapes[i];
+                        std::string shapeId = modelName + "_shape_" + std::to_string(i);
+                        
+                        // Shape 节点
+                        bool shapeNodeOpen = ImGui::TreeNode(("Shape: " + shape->name).c_str());
+                        
+                        // Shape 右键菜单
+                        if (ImGui::BeginPopupContextItem()) {
+                            if (ImGui::MenuItem("隐藏 Shape")) {
+                                // 假设 Shape 有 visible 属性
+                                // shape->visible = false;
+                            }
+                            if (ImGui::MenuItem("重置材质")) {
+                                ApplyDefaultMaterial(std::dynamic_pointer_cast<ShadowedBlinnPhongMaterial>(shape->material)->property);
+                            }
+                            ImGui::EndPopup();
+                        }
+                        
+                        if (shapeNodeOpen) {
+                            ImGui::PushID(shapeId.c_str());
+
+                            // 显示 Shape 信息
+                            ImGui::Text("Triangles: %zu", shape->mesh.size());
+                            
+                            // 材质编辑区域
+                            if (ImGui::CollapsingHeader("Material Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+                                ShowMaterialEditor(shape);
+                            }
+
+                            ImGui::PopID();
+                            ImGui::TreePop();
+                        }
+                    }
+                }
+
+                ImGui::PopID();
+                ImGui::TreePop();
+            }
+            ImGui::Separator();
+        }
+
+        // 延迟删除模型（避免在迭代时修改容器）
+        if (!modelToDelete.empty()) {
+            // 显示确认对话框
+            ImGui::OpenPopup("Confirm Delete");
+        }
+
+        // 删除确认对话框
+        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("确定要删除模型 '%s' 吗？", modelToDelete.c_str());
+            ImGui::Text("此操作无法撤销！");
+            ImGui::Separator();
+
+            if (ImGui::Button("确定删除", ImVec2(120, 0))) {
+                // ✅ 使用 Scene::RemoveModel 方法
+                scene->RemoveModel(modelToDelete);
+                std::cout << "[Scene] 已删除模型: " << modelToDelete << std::endl;
+                
+                modelToDelete.clear();
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::SameLine();
+            if (ImGui::Button("取消", ImVec2(120, 0))) {
+                modelToDelete.clear();
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // 批量操作区域
+        ImGui::Separator();
+        if (ImGui::CollapsingHeader("Batch Operations")) {
+            if (ImGui::Button("删除所有模型")) {
+                ImGui::OpenPopup("Confirm Delete All");
+            }
+            
+            if (ImGui::BeginPopupModal("Confirm Delete All", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::Text("确定要删除所有模型吗？");
+                ImGui::Text("此操作无法撤销！");
+                ImGui::Separator();
+
+                if (ImGui::Button("确定删除", ImVec2(120, 0))) {
+                    scene->ClearObjects(); // 使用现有的清除方法
+                    std::cout << "[Scene] 已清除所有模型" << std::endl;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SetItemDefaultFocus();
+                ImGui::SameLine();
+                if (ImGui::Button("取消", ImVec2(120, 0))) {
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("应用默认材质到所有")) {
+                for (auto& [modelName, model] : scene->models) {
+                    for (auto& shape : model->shapes) {
+                        auto material = std::dynamic_pointer_cast<ShadowedBlinnPhongMaterial>(shape->material);
+                        if (material) {
+                            ApplyDefaultMaterial(material->property);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (ImGui::Button("关闭窗口")) 
+            *p_open = false;
+
+        ImGui::End();
+    }
+
+    // 材质编辑器
+    void Application::ShowMaterialEditor(sptr<Shape> shape) {
+        auto material = std::dynamic_pointer_cast<ShadowedBlinnPhongMaterial>(shape->material);
+        if (!material) {
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "材质类型不匹配！");
+            return;
+        }
+
+        auto& prop = material->property;
+
+        // 基础材质属性
+        if (ImGui::CollapsingHeader("Basic Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::SliderFloat("Shininess", &prop.shininess, 0.0f, 128.0f);
+            
+            ImGui::ColorEdit3("Ambient", prop.ambient.data());
+            ImGui::SliderFloat("Ambient Intensity", &prop.ambientIntensity, 0.0f, 1.0f);
+            
+            ImGui::ColorEdit3("Diffuse", prop.diffuse.data());
+            ImGui::SliderFloat("Diffuse Intensity", &prop.diffuseIntensity, 0.0f, 1.0f);
+            
+            ImGui::ColorEdit3("Specular", prop.specular.data());
+            ImGui::SliderFloat("Specular Intensity", &prop.specularIntensity, 0.0f, 1.0f);
+        }
+
+        // 阴影属性
+        if (ImGui::CollapsingHeader("Shadow Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::SliderFloat("Shadow Intensity", &prop.shadowIntensity, 0.0f, 1.0f);
+            ImGui::InputFloat("Shadow Bias", &prop.shadowBias, 0.0001f, 0.001f, "%.6f");
+            
+            ImGui::SliderInt("PCF Samples", &prop.pcfSamples, 1, 5);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("1 = 硬阴影\n3 = 软阴影 (3x3)\n5 = 高质量软阴影 (5x5)");
+            }
+            
+            ImGui::SliderFloat("Distance Attenuation", &prop.shadowDistanceAttenuation, 0.0f, 50.0f);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("控制环境光阴影的距离衰减速度");
+            }
+            
+            ImGui::SliderFloat("Min Shadow Intensity", &prop.shadowMinIntensity, 0.0f, 1.0f);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("远距离阴影的最小强度");
+            }
+            
+            /*ImGui::SliderFloat("Max Shadow Distance", &prop.shadowMaxDistance, 0.01f, 0.5f);
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("阴影距离衰减的最大范围");
+            }*/
+        }
+
+        // 材质预设
+        if (ImGui::CollapsingHeader("Material Presets")) {
+            if (ImGui::Button("金属材质")) {
+                ApplyMetallicMaterial(prop);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("塑料材质")) {
+                ApplyPlasticMaterial(prop);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("橡胶材质")) {
+                ApplyRubberMaterial(prop);
+            }
+            
+            if (ImGui::Button("玉石材质")) {
+                ApplyJadeMaterial(prop);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("默认材质")) {
+                ApplyDefaultMaterial(prop);
+            }
+        }
+
+        // 纹理信息
+        if (ImGui::CollapsingHeader("Texture Info")) {
+            if (prop.texture) {
+                ImGui::Text("Texture: %dx%d", prop.texture->GetWidth(), prop.texture->GetHeight());
+            } else {
+                ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No texture");
+            }
+        }
+    }
+
+    // 简化的配置窗口（主要是相机和光源）
+    void Application::ShowConfigWindow(bool* p_open, sptr<Camera> camera) {
+        ImGui::Begin("Camera & Light Config", p_open);
+
+        const float PI = std::numbers::pi_v<float>;
+
+        // 相机设置
+        if (ImGui::CollapsingHeader("Camera Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::DragFloat3("Camera Position", camera->Position.data(), 0.1f);
+            ImGui::SliderFloat("Yaw   (°)", &camera->eluaAngle.x(), -180.0f, 180.0f);
+            ImGui::SliderFloat("Pitch (°)", &camera->eluaAngle.y(), -89.0f, 89.0f);
+            ImGui::SliderFloat("Roll  (°)", &camera->eluaAngle.z(), -180.0f, 180.0f);
+            ImGui::SliderFloat("FOV (°)", &camera->Fov, 1.0f, 180.0f);
+            ImGui::InputFloat("Near Plane", &camera->Near, 0.0001f, 0.001f, "%.6f");
+            ImGui::InputFloat("Far Plane", &camera->Far, 0.01f, 1.f, "%.6f");
+        }
+
+        // 光源设置
+        if (ImGui::CollapsingHeader("Light Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+            auto light = scene->mainLight;
+            if (light) {
+                static float lightYaw = -90.0f;
+                static float lightPitch = 0.0f;
+                static float lightRoll = -180.f;
+                
+                ImGui::SliderFloat("Light Yaw   (°)", &lightYaw, -180.0f, 180.0f);
+                ImGui::SliderFloat("Light Pitch (°)", &lightPitch, -89.0f, 89.0f);
+                ImGui::SliderFloat("Light Roll  (°)", &lightRoll, -180.0f, 180.0f);
+                
+                // 更新光源方向
+                float lightYawRad = lightYaw * PI / 180.0f;
+                float lightPitchRad = lightPitch * PI / 180.0f;
+                Vector3f lightFront;
+                lightFront.x() = cosf(lightPitchRad) * cosf(lightYawRad);
+                lightFront.y() = sinf(lightPitchRad);
+                lightFront.z() = cosf(lightPitchRad) * sinf(lightYawRad);
+                light->direction = lightFront.normalized();
+                scene->directionalShadow->SetLightDirection(light->direction);
+            } else {
+                ImGui::Text("No light source");
+            }
+        }
+
+        if (ImGui::Button("Close")) 
+            *p_open = false;
+
+        ImGui::End();
+    }
+
+    // 分离的模型加载器窗口
+    void Application::ShowModelLoaderWindow(bool* p_open) {
+        ImGui::Begin("Model Loader", p_open, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::Text("Load 3D Model Files");
+        ImGui::Separator();
+        
+        // 文件路径输入框
+        static char filePath[512] = R"(F:\绝区零安比\无标题.obj)";
+        ImGui::InputTextWithHint("##filepath", "Enter file path or browse...", filePath, sizeof(filePath));
+
+        ImGui::SameLine();
+        if (ImGui::Button("Browse...")) {
+            IGFD::FileDialogConfig config;
+            config.path = "F:\\";
+            config.countSelectionMax = 1;
+            config.flags = ImGuiFileDialogFlags_Modal;
+            
+            ImGuiFileDialog::Instance()->OpenDialog(
+                "ChooseModelFile",
+                "Choose 3D Model File",
+                ".obj,.fbx,.dae,.ply,.stl",
+                config
+            );
+        }
+        
+        // 显示文件对话框
+        if (ImGuiFileDialog::Instance()->Display("ChooseModelFile", 
+            ImGuiWindowFlags_None, 
+            ImVec2(800, 600))) {
+            
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string selectedFile = ImGuiFileDialog::Instance()->GetFilePathName();
+                strncpy_s(filePath, selectedFile.c_str(), sizeof(filePath) - 1);
+                filePath[sizeof(filePath) - 1] = '\0';
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
+        
+        ImGui::Separator();
+        
+        if (ImGui::Button("Load Model")) {
+            if (strlen(filePath) > 0) {
+                LoadModel(filePath);
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear All Models")) {
+            ImGui::OpenPopup("Confirm Clear All");
+        }
+        
+        // 清除所有模型的确认对话框
+        if (ImGui::BeginPopupModal("Confirm Clear All", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("确定要清除所有已加载的模型吗？");
+            ImGui::Text("此操作无法撤销！");
+            ImGui::Separator();
+
+            if (ImGui::Button("确定清除", ImVec2(120, 0))) {
+                scene->ClearObjects();
+                std::cout << "[Scene] 已清除所有模型" << std::endl;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::SameLine();
+            if (ImGui::Button("取消", ImVec2(120, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+        
+        ImGui::Separator();
+        
+        // 显示已加载的模型信息
+        if (!scene->models.empty()) {
+            ImGui::Text("Loaded Models:");
+            for (const auto& [name, model] : scene->models) {
+                ImGui::BulletText("%s (%zu shapes)", name.c_str(), model->shapes.size());
+            }
+        } else {
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No models loaded");
+        }
+
+        if (ImGui::Button("Close")) 
+            *p_open = false;
+        
+        ImGui::End();
+    }
+
+    // 材质预设函数
+    void Application::ApplyDefaultMaterial(ShadowedBlinnPhongMaterial::property_t& prop) {
+        prop.shininess = 64.0f;
+        prop.ambient = Vector3f(1.f, 1.f, 1.f);
+        prop.diffuse = Vector3f(1.f, 1.f, 1.f);
+        prop.specular = Vector3f(1.f, 1.f, 1.f);
+        prop.ambientIntensity = 0.43f;
+        prop.diffuseIntensity = 0.47f;
+        prop.specularIntensity = 0.1f;
+    }
+
+    void Application::ApplyMetallicMaterial(ShadowedBlinnPhongMaterial::property_t& prop) {
+        prop.shininess = 128.0f;
+        prop.ambient = Vector3f(0.1f, 0.1f, 0.1f);
+        prop.diffuse = Vector3f(0.4f, 0.4f, 0.4f);
+        prop.specular = Vector3f(1.0f, 1.0f, 1.0f);
+        prop.ambientIntensity = 0.2f;
+        prop.diffuseIntensity = 0.3f;
+        prop.specularIntensity = 0.8f;
+    }
+
+    void Application::ApplyPlasticMaterial(ShadowedBlinnPhongMaterial::property_t& prop) {
+        prop.shininess = 32.0f;
+        prop.ambient = Vector3f(0.3f, 0.3f, 0.3f);
+        prop.diffuse = Vector3f(0.7f, 0.7f, 0.7f);
+        prop.specular = Vector3f(0.5f, 0.5f, 0.5f);
+        prop.ambientIntensity = 0.4f;
+        prop.diffuseIntensity = 0.7f;
+        prop.specularIntensity = 0.4f;
+    }
+
+    void Application::ApplyRubberMaterial(ShadowedBlinnPhongMaterial::property_t& prop) {
+        prop.shininess = 8.0f;
+        prop.ambient = Vector3f(0.4f, 0.4f, 0.4f);
+        prop.diffuse = Vector3f(0.8f, 0.8f, 0.8f);
+        prop.specular = Vector3f(0.1f, 0.1f, 0.1f);
+        prop.ambientIntensity = 0.5f;
+        prop.diffuseIntensity = 0.8f;
+        prop.specularIntensity = 0.1f;
+    }
+
+    void Application::ApplyJadeMaterial(ShadowedBlinnPhongMaterial::property_t& prop) {
+        prop.shininess = 96.0f;
+        prop.ambient = Vector3f(0.135f, 0.2225f, 0.1575f);
+        prop.diffuse = Vector3f(0.54f, 0.89f, 0.63f);
+        prop.specular = Vector3f(0.316228f, 0.316228f, 0.316228f);
+        prop.ambientIntensity = 0.6f;
+        prop.diffuseIntensity = 0.7f;
+        prop.specularIntensity = 0.5f;
     }
 }
